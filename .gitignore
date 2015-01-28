@@ -26,6 +26,7 @@ QuantLib/Examples/*/bin/
 QuantLib/Examples/*/build/
 QuantLib/build/
 QuantLib/lib/
+QuantLib/ipch/
 QuantLib/test-suite/bin/QuantLib-test-suite-*.manifest
 QuantLib/test-suite/build/
 QuantLib/test-suite/*.trs
@@ -104,6 +105,8 @@ XL-Launcher/bin/Configuration/UserConfigured/
 XL-Launcher/bin/Debug/
 XL-Launcher/bin/Release/
 XL-Launcher/obj/
+QuantLib/PythonModule/Debug/
+QuantLib/PythonModule/Release/
 
 # Artifacts created in multiple directories
 Makefile
@@ -132,6 +135,7 @@ Makefile.in
 *.log
 *.sdf
 *.opensdf
+*.ipch
 
 # Outputs
 QuantLib/Examples/BasketLosses/BasketLosses

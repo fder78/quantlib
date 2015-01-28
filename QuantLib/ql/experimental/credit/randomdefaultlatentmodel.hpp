@@ -167,10 +167,10 @@ namespace QuantLib {
         techniques to improve it (not implemented here) see:
         Joshi, M., D. Kainth. 2004. Rapid and accurate development of prices
         and Greeks for nth to default credit swaps in the Li model. Quantitative
-        Finance, Vol. 4. Institute of Physics Publishing, London, UK, 266–275
+        Finance, Vol. 4. Institute of Physics Publishing, London, UK, 266?75
         and:
         Chen, Z., Glasserman, P. 'Fast pricing of basket default swaps' in
-        Operations Research Vol. 56, No. 2, March–April 2008, pp. 286–303
+        Operations Research Vol. 56, No. 2, March–April 2008, pp. 286?03
         */
         virtual Disposable<std::vector<Probability> > probsBeingNthEvent(Size n,
             const Date& d) const;
@@ -368,8 +368,7 @@ namespace QuantLib {
                     // ...and is contained in the basket.
                         portfSimLoss +=
                             basket_->exposure(basket_->names()[iName],
-                                Date(events[iEvt].dayFromRef +
-                                    today.serialNumber())) *
+                                Date(BigInteger(events[iEvt].dayFromRef) + today.serialNumber())) *
                                         (1.-getEventRecovery(events[iEvt]));
                }
             }
@@ -426,7 +425,7 @@ namespace QuantLib {
           //          if(basket_->pool()->has(copula_->pool()->names()[iName]))
                         portfSimLoss +=
                             basket_->exposure(basket_->names()[iName],
-                                Date(events[iEvt].dayFromRef +
+                                Date(BigInteger(events[iEvt].dayFromRef) +
                                     today.serialNumber())) *
                                         (1.-getEventRecovery(events[iEvt]));
                 }
@@ -468,7 +467,7 @@ namespace QuantLib {
                     //if(basket_->pool()->has(copula_->pool()->names()[iName]))
                         portfSimLoss +=
                             basket_->exposure(basket_->names()[iName],
-                                Date(events[iEvt].dayFromRef +
+                                Date(BigInteger(events[iEvt].dayFromRef) +
                                     today.serialNumber())) *
                                         (1.-getEventRecovery(events[iEvt]));
                 }
@@ -558,7 +557,7 @@ namespace QuantLib {
                  //   if(basket_->pool()->has(copula_->pool()->names()[iName]))
                         portfSimLoss +=
                             basket_->exposure(basket_->names()[iName],
-                                Date(events[iEvt].dayFromRef +
+                                Date(BigInteger(events[iEvt].dayFromRef) +
                                     today.serialNumber())) *
                                         (1.-getEventRecovery(events[iEvt]));
                 }
@@ -664,7 +663,7 @@ namespace QuantLib {
                 // if(basket_->pool()->has(copula_->pool()->names()[iName])) {
                         portfSimLoss +=
                             basket_->exposure(basket_->names()[iName],
-                                Date(events[iEvt].dayFromRef +
+                                Date(BigInteger(events[iEvt].dayFromRef) +
                                     today.serialNumber())) *
                                         (1.-getEventRecovery(events[iEvt]));
                         //and will sort later if buffer applies:
@@ -690,7 +689,7 @@ namespace QuantLib {
             // basket_->remainingNotionals(Date(simsBuffer_[i].dayFromRef +
             //      today.serialNumber()))[iName] *
                         basket_->exposure(basket_->names()[iName],
-                            Date(splitEventsBuffer[i].dayFromRef +
+                            Date(BigInteger(splitEventsBuffer[i].dayFromRef) +
                                 today.serialNumber())) *
                                 (1.-getEventRecovery(splitEventsBuffer[i]));
 

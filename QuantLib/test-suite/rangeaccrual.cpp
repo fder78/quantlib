@@ -110,22 +110,22 @@ namespace {
 
             // Yield Curve
             std::vector<Date> dates;
-            dates.push_back(Date(39147));    dates.push_back(Date(39148));    dates.push_back(Date(39151));
-            dates.push_back(Date(39153));    dates.push_back(Date(39159));    dates.push_back(Date(39166));
-            dates.push_back(Date(39183));    dates.push_back(Date(39294));    dates.push_back(Date(39384));
-            dates.push_back(Date(39474));    dates.push_back(Date(39567));    dates.push_back(Date(39658));
-            dates.push_back(Date(39748));    dates.push_back(Date(39839));    dates.push_back(Date(39931));
-            dates.push_back(Date(40250));    dates.push_back(Date(40614));    dates.push_back(Date(40978));
-            dates.push_back(Date(41344));    dates.push_back(Date(41709));    dates.push_back(Date(42074));
-            dates.push_back(Date(42441));    dates.push_back(Date(42805));    dates.push_back(Date(43170));
-            dates.push_back(Date(43535));    dates.push_back(Date(43900));    dates.push_back(Date(44268));
-            dates.push_back(Date(44632));    dates.push_back(Date(44996));    dates.push_back(Date(45361));
-            dates.push_back(Date(45727));    dates.push_back(Date(46092));    dates.push_back(Date(46459));
-            dates.push_back(Date(46823));    dates.push_back(Date(47188));    dates.push_back(Date(47553));
-            dates.push_back(Date(47918));    dates.push_back(Date(48283));    dates.push_back(Date(48650));
-            dates.push_back(Date(49014));    dates.push_back(Date(49379));    dates.push_back(Date(49744));
-            dates.push_back(Date(50110));    dates.push_back(Date(53762));    dates.push_back(Date(57415));
-            dates.push_back(Date(61068));
+            dates.push_back(Date(BigInteger(39147)));    dates.push_back(Date(BigInteger(39148)));    dates.push_back(Date(BigInteger(39151)));
+            dates.push_back(Date(BigInteger(39153)));    dates.push_back(Date(BigInteger(39159)));    dates.push_back(Date(BigInteger(39166)));
+            dates.push_back(Date(BigInteger(39183)));    dates.push_back(Date(BigInteger(39294)));    dates.push_back(Date(BigInteger(39384)));
+            dates.push_back(Date(BigInteger(39474)));    dates.push_back(Date(BigInteger(39567)));    dates.push_back(Date(BigInteger(39658)));
+            dates.push_back(Date(BigInteger(39748)));    dates.push_back(Date(BigInteger(39839)));    dates.push_back(Date(BigInteger(39931)));
+            dates.push_back(Date(BigInteger(40250)));    dates.push_back(Date(BigInteger(40614)));    dates.push_back(Date(BigInteger(40978)));
+            dates.push_back(Date(BigInteger(41344)));    dates.push_back(Date(BigInteger(41709)));    dates.push_back(Date(BigInteger(42074)));
+            dates.push_back(Date(BigInteger(42441)));    dates.push_back(Date(BigInteger(42805)));    dates.push_back(Date(BigInteger(43170)));
+            dates.push_back(Date(BigInteger(43535)));    dates.push_back(Date(BigInteger(43900)));    dates.push_back(Date(BigInteger(44268)));
+            dates.push_back(Date(BigInteger(44632)));    dates.push_back(Date(BigInteger(44996)));    dates.push_back(Date(BigInteger(45361)));
+            dates.push_back(Date(BigInteger(45727)));    dates.push_back(Date(BigInteger(46092)));    dates.push_back(Date(BigInteger(46459)));
+            dates.push_back(Date(BigInteger(46823)));    dates.push_back(Date(BigInteger(47188)));    dates.push_back(Date(BigInteger(47553)));
+            dates.push_back(Date(BigInteger(47918)));    dates.push_back(Date(BigInteger(48283)));    dates.push_back(Date(BigInteger(48650)));
+            dates.push_back(Date(BigInteger(49014)));    dates.push_back(Date(BigInteger(49379)));    dates.push_back(Date(BigInteger(49744)));
+            dates.push_back(Date(BigInteger(50110)));    dates.push_back(Date(BigInteger(53762)));    dates.push_back(Date(BigInteger(57415)));
+            dates.push_back(Date(BigInteger(61068)));
 
             std::vector<Rate> zeroRates;
             zeroRates.push_back(0.02676568527);    zeroRates.push_back(0.02676568527);
@@ -1427,7 +1427,7 @@ namespace {
 
             //General Settings
             calendar = TARGET();
-            today = Date(39147); // 6 Mar 2007
+            today = Date(BigInteger(39147)); // 6 Mar 2007
             Settings::instance().evaluationDate() = today;
             settlement = today;
             //create Yield Curve
@@ -1448,8 +1448,8 @@ namespace {
             infiniteUpperStrike = 1.0;
             correlation = 1.0;
 
-            startDate = Date(42800); //6 Mar 2017
-            endDate = Date(42984);   //6 Sep 2017
+            startDate = Date(BigInteger(42800)); //6 Mar 2017
+            endDate = Date(BigInteger(42984));   //6 Sep 2017
             paymentDate = endDate;   //6 Sep 2017
             fixingDays = 2;
             rangeCouponDayCount = iborIndex->dayCounter();

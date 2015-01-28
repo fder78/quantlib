@@ -24,17 +24,8 @@
 #include <ql/time/date.hpp>
 #include <ql/utilities/dataformatters.hpp>
 #include <ql/errors.hpp>
-#if defined(__GNUC__) && (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 8)) || (__GNUC__ > 4))
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-local-typedefs"
-#endif
-#include <boost/date_time/gregorian/gregorian.hpp>
-#if defined(__GNUC__) && (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 8)) || (__GNUC__ > 4))
-#pragma GCC diagnostic pop
-#endif
 #include <iomanip>
 #include <ctime>
-
 #if defined(BOOST_NO_STDC_NAMESPACE)
     namespace std { using ::time; using ::time_t; using ::tm;
                     using ::gmtime; using ::localtime; }
@@ -44,14 +35,20 @@ namespace QuantLib {
 
     // constructors
     Date::Date()
-    : serialNumber_(BigInteger(0)) {}
+    : serialNumber_(BigInteger(0))
+    , second_(maximumSecond())
+    {}
 
     Date::Date(BigInteger serialNumber)
-    : serialNumber_(serialNumber) {
+    : serialNumber_(serialNumber)
+    , second_(maximumSecond())
+    {
         checkSerialNumber(serialNumber);
     }
 
-    Date::Date(Day d, Month m, Year y) {
+    Date::Date(Day d, Month m, Year y)
+      : second_(maximumSecond())
+    {
         QL_REQUIRE(y > 1900 && y < 2200,
                    "year " << y << " out of bound. It must be in [1901,2199]");
         QL_REQUIRE(Integer(m) > 0 && Integer(m) < 13,
@@ -144,7 +141,11 @@ namespace QuantLib {
         std::tm *lt = std::localtime(&t);
         return Date(Day(lt->tm_mday),
                     Month(lt->tm_mon+1),
-                    Year(lt->tm_year+1900));
+                    Year(lt->tm_year+1900),
+                    Hour(lt->tm_hour),
+                    Minute(lt->tm_min),
+                    Second(lt->tm_sec)
+                    );
     }
 
     Date Date::minDate() {
@@ -184,7 +185,7 @@ namespace QuantLib {
             if (d > length)
                 d = length;
 
-            return Date(d, Month(m), y);
+            return Date( Date(d, Month(m), y).serialNumber(), date.second() );
           }
           case Years: {
               Day d = date.dayOfMonth();
@@ -198,7 +199,7 @@ namespace QuantLib {
               if (d == 29 && m == February && !isLeap(y))
                   d = 28;
 
-              return Date(d,m,y);
+              return Date( Date(d,m,y).serialNumber(), date.second() );
           }
           default:
             QL_FAIL("undefined time units");
@@ -290,7 +291,7 @@ namespace QuantLib {
                    "no more than 5 weekday in a given (month, year)");
         Weekday first = Date(1, m, y).weekday();
         Size skip = nth - (dayOfWeek>=first ? 1 : 0);
-        return Date((1 + dayOfWeek + skip*7) - first, m, y);
+        return Date(1 + dayOfWeek-first + skip*7, m, y);
     }
 
     Integer Date::monthLength(Month m, bool leapYear) {
@@ -492,22 +493,6 @@ namespace QuantLib {
             }
             return out;
         }
-
-        std::ostream& operator<<(std::ostream& out,
-                                 const formatted_date_holder& holder) {
-            using namespace boost::gregorian;
-            const Date& d = holder.d;
-            if (d == Date()) {
-                out << "null date";
-            } else {
-                date boostDate(d.year(), d.month(), d.dayOfMonth());
-                out.imbue(std::locale(std::locale(),
-                                      new date_facet(holder.f.c_str())));
-                out << boostDate;
-            }
-            return out;
-        }
-
     }
 
     namespace io {
@@ -524,11 +509,54 @@ namespace QuantLib {
             return detail::iso_date_holder(d);
         }
 
-        detail::formatted_date_holder formatted_date(const Date& d,
-                                                     const std::string& f) {
-            return detail::formatted_date_holder(d, f);
-        }
-
     }
 
+  // HC Added
+    Date::Date( BigInteger serialNumber, BigInteger second)
+      : serialNumber_( serialNumber )
+      , second_( second )
+    {       
+      checkSerialNumber(serialNumber);
+    }
+	
+    Date::Date(Day d, Month m, Year y, Hour h, Minute mnt, Second sec )
+    {
+        QL_REQUIRE(y > 1900 && y < 2200,
+                   "year " << y << " out of bound. It must be in [1901,2199]");
+        QL_REQUIRE(Integer(m) > 0 && Integer(m) < 13,
+                   "month " << Integer(m)
+                   << " outside January-December range [1,12]");
+
+        bool leap = isLeap(y);
+        Day len = monthLength(m,leap), offset = monthOffset(m,leap);
+        QL_REQUIRE(d <= len && d > 0,
+                   "day outside month (" << Integer(m) << ") day-range "
+                   << "[1," << len << "]");
+
+        serialNumber_ = d + offset + yearOffset(y);
+        second_ = sec + ( h * 60 + mnt ) * 60;
+    }
+
+	Date::Date( Time t )
+	{
+		serialNumber_ = static_cast<BigInteger>( t );
+		second_ = static_cast<BigInteger>( ( t - static_cast<Time>( static_cast<BigInteger>( t ) ) ) * 86400.	);
+
+		if( second_ < 0 )
+		{
+			second_ = 0;
+		}
+
+		checkSerialNumber( serialNumber() );
+		checkSecond( second() );
+	}
+
+    void Date::checkSecond(BigInteger sec) {
+      QL_REQUIRE(sec >= minimumSecond() &&
+        sec <= maximumSecond(),
+        "Date's second (" << sec << ") outside "
+        "allowed range [" << minimumSecond() <<
+        "-" << maximumSecond() << "], i.e. [" <<
+        minDate() << "-" << maxDate() << "]");
+    }
 }

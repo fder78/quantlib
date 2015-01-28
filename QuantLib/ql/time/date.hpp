@@ -74,6 +74,11 @@ namespace QuantLib {
     /*! \ingroup datetime */
     typedef Integer Year;
 
+    // HC Added
+    typedef Integer Hour;
+    typedef Integer Minute;
+    typedef Integer Second;
+
 
     //! Concrete date class
     /*! This class provides methods to inspect dates as well as methods and
@@ -178,6 +183,25 @@ namespace QuantLib {
         static BigInteger minimumSerialNumber();
         static BigInteger maximumSerialNumber();
         static void checkSerialNumber(BigInteger serialNumber);
+
+      // HC Added
+      public:
+        explicit Date(BigInteger serialNumber, BigInteger second);
+		explicit Date(Time t);
+
+        // 24hr notation
+        explicit Date(Day d, Month m, Year y, Hour h, Minute mnt, Second sec );
+
+        BigInteger second() const { return second_; }
+
+      private:
+        BigInteger second_;
+
+        static void checkSecond(BigInteger serialNumber);
+
+      public:
+        static BigInteger maximumSecond() { return 86399; }
+        static BigInteger minimumSecond() { return 0; }
     };
 
     /*! \relates Date
@@ -220,14 +244,6 @@ namespace QuantLib {
         };
         std::ostream& operator<<(std::ostream&, const iso_date_holder&);
 
-        struct formatted_date_holder {
-            formatted_date_holder(const Date& d, const std::string& f)
-            : d(d), f(f) {}
-            Date d;
-            std::string f;
-        };
-        std::ostream& operator<<(std::ostream&, const formatted_date_holder&);
-
     }
 
     namespace io {
@@ -243,11 +259,6 @@ namespace QuantLib {
         //! output dates in ISO format (yyyy-mm-dd)
         /*! \ingroup manips */
         detail::iso_date_holder iso_date(const Date&);
-
-        //! output dates in user defined format using boost date functionality
-        /*! \ingroup manips */
-        detail::formatted_date_holder formatted_date(const Date&,
-                                                     const std::string& fmt);
 
     }
 
@@ -280,12 +291,13 @@ namespace QuantLib {
         return serialNumber_;
     }
 
+    // HC Modified
     inline Date Date::operator+(BigInteger days) const {
-        return Date(serialNumber_+days);
+        return Date(serialNumber_+days, second_ );
     }
 
     inline Date Date::operator-(BigInteger days) const {
-        return Date(serialNumber_-days);
+        return Date(serialNumber_-days, second_ );
     }
 
     inline Date Date::operator+(const Period& p) const {
@@ -306,32 +318,33 @@ namespace QuantLib {
        return (d.dayOfMonth() == monthLength(d.month(), isLeap(d.year())));
     }
 
+    // HC Modified
     inline BigInteger operator-(const Date& d1, const Date& d2) {
-        return d1.serialNumber()-d2.serialNumber();
+        return d1.serialNumber() - d2.serialNumber(); // static_cast<Time>( d1.second() - d2.second() ) / 86400.0;
     }
 
     inline bool operator==(const Date& d1, const Date& d2) {
-        return (d1.serialNumber() == d2.serialNumber());
+        return ( ( d1.serialNumber() == d2.serialNumber() ) && ( d1.second() == d2.second() ) );
     }
 
     inline bool operator!=(const Date& d1, const Date& d2) {
-        return (d1.serialNumber() != d2.serialNumber());
+        return ( (d1.serialNumber() != d2.serialNumber() ) || ( d1.second() != d2.second() ) );
     }
 
     inline bool operator<(const Date& d1, const Date& d2) {
-        return (d1.serialNumber() < d2.serialNumber());
+        return ( (d1.serialNumber() < d2.serialNumber() ) || ( ( d1.serialNumber() == d2.serialNumber() ) && ( d1.second() < d2.second() ) ) );
     }
 
     inline bool operator<=(const Date& d1, const Date& d2) {
-        return (d1.serialNumber() <= d2.serialNumber());
+        return ( ( d1.serialNumber() < d2.serialNumber() ) || ( ( d1.serialNumber() == d2.serialNumber() ) && ( d1.second() <= d2.second() ) ) );
     }
 
     inline bool operator>(const Date& d1, const Date& d2) {
-        return (d1.serialNumber() > d2.serialNumber());
+        return ( (d1.serialNumber() > d2.serialNumber()) || ( ( d1.serialNumber() == d2.serialNumber() ) && ( d1.second() > d2.second() ) ) );
     }
 
     inline bool operator>=(const Date& d1, const Date& d2) {
-        return (d1.serialNumber() >= d2.serialNumber());
+        return ( (d1.serialNumber() > d2.serialNumber()) || ( ( d1.serialNumber() == d2.serialNumber() ) && ( d1.second() >= d2.second() ) ) );
     }
 
 }
