@@ -645,7 +645,7 @@ int main(int argc, char *argv[]) {
         for (Size i = 0; i < basket.size(); ++i)
             basket[i]->setPricingEngine(swaptionEngineMarkov);
 
-        waitForKey();
+        //waitForKey();
 
         timer.start();
         markov->calibrate(basket, method, ec);
