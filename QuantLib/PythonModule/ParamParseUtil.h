@@ -4,6 +4,15 @@
 
 enum E_ProductType;
 
+enum E_CallTenor
+{
+	CT_Annually = 12,
+	CT_SemiAnnually = 6,
+	CT_Quarterly = 3,
+	CT_Once = -1,
+};
+
+
 class ProductParser : public EnumParser<ProductParser, E_ProductType>
 {
 public:
@@ -67,3 +76,4 @@ public:
 
 	void BuildEnumMap();
 };
+

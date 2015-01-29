@@ -489,6 +489,39 @@
     </Bscmake>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="ds_interestrate_derivatives\cashflows\range_accrual_coupon.hpp" />
+    <ClInclude Include="ds_interestrate_derivatives\cashflows\spread_coupon.hpp" />
+    <ClInclude Include="ds_interestrate_derivatives\index\index_calculator.hpp" />
+    <ClInclude Include="ds_interestrate_derivatives\index\spread_index.hpp" />
+    <ClInclude Include="ds_interestrate_derivatives\instruments\callability.hpp" />
+    <ClInclude Include="ds_interestrate_derivatives\instruments\notes\callable_cpn_bond.hpp" />
+    <ClInclude Include="ds_interestrate_derivatives\instruments\notes\fixedrate_cpn_bond.hpp" />
+    <ClInclude Include="ds_interestrate_derivatives\instruments\notes\power_spread_note.hpp" />
+    <ClInclude Include="ds_interestrate_derivatives\instruments\notes\range_accrual_note.hpp" />
+    <ClInclude Include="ds_interestrate_derivatives\instruments\swaps\cross_ccy_swap.hpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug (static runtime)|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release (static runtime)|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="ds_interestrate_derivatives\instruments\swaps\power_spread_swap.hpp" />
+    <ClInclude Include="ds_interestrate_derivatives\instruments\swaps\range_accrual_swap.hpp" />
+    <ClInclude Include="ds_interestrate_derivatives\model\generalized_hullwhite.hpp" />
+    <ClInclude Include="ds_interestrate_derivatives\pricingengine\fdm_engine\fdm_ghw_op.hpp" />
+    <ClInclude Include="ds_interestrate_derivatives\pricingengine\fdm_engine\fdm_ghw_solver.hpp" />
+    <ClInclude Include="ds_interestrate_derivatives\pricingengine\fdm_engine\fdm_ra_engine_ghw.hpp" />
+    <ClInclude Include="ds_interestrate_derivatives\pricingengine\fdm_engine\fdm_ra_stepcondition_ghw.hpp" />
+    <ClInclude Include="ds_interestrate_derivatives\pricingengine\mc_ir_early_exercise_path_pricer.hpp" />
+    <ClInclude Include="ds_interestrate_derivatives\pricingengine\mc_ir_lsmc_pathpricer.hpp" />
+    <ClInclude Include="ds_interestrate_derivatives\pricingengine\mc_lsmc_engine.hpp" />
+    <ClInclude Include="ds_interestrate_derivatives\pricingengine\mc_lsmc_pathpricer.hpp" />
+    <ClInclude Include="ds_interestrate_derivatives\pricingengine\mc_powerspread_note_lsmc_engine.hpp" />
+    <ClInclude Include="ds_interestrate_derivatives\pricingengine\mc_powerspread_swap_lsmc_engine.hpp" />
+    <ClInclude Include="ds_interestrate_derivatives\pricingengine\mc_rangeaccrual_note_lsmc_engine.hpp" />
+    <ClInclude Include="ds_interestrate_derivatives\pricingengine\mc_rangeaccrual_swap_lsmc_engine.hpp" />
+    <ClInclude Include="ds_interestrate_derivatives\pricingengine\tree_engine\discretized_callable_bond.hpp" />
+    <ClInclude Include="ds_interestrate_derivatives\pricingengine\tree_engine\tree_callable_bond_engine.hpp" />
+    <ClInclude Include="ds_interestrate_derivatives\termstructure\fx_term_structure.hpp" />
     <ClInclude Include="ql\cashflows\cpicoupon.hpp" />
     <ClInclude Include="ql\cashflows\cpicouponpricer.hpp" />
     <ClInclude Include="ql\experimental\exercise\all.hpp" />
@@ -503,6 +536,7 @@
     <ClInclude Include="ql\experimental\finitedifferences\fdmextoujumpop.hpp" />
     <ClInclude Include="ql\experimental\finitedifferences\fdmextoujumpsolver.hpp" />
     <ClInclude Include="ql\experimental\finitedifferences\fdmhestonfwdop.hpp" />
+    <ClInclude Include="ql\experimental\finitedifferences\fdmhullwhitemesher.hpp" />
     <ClInclude Include="ql\experimental\finitedifferences\fdmklugeextouop.hpp" />
     <ClInclude Include="ql\experimental\finitedifferences\fdmklugeextousolver.hpp" />
     <ClInclude Include="ql\experimental\finitedifferences\fdmsimple2dextousolver.hpp" />
@@ -523,6 +557,8 @@
     <ClInclude Include="ql\experimental\processes\extouwithjumpsprocess.hpp" />
     <ClInclude Include="ql\experimental\processes\gemanroncoroniprocess.hpp" />
     <ClInclude Include="ql\experimental\processes\klugeextouprocess.hpp" />
+    <ClInclude Include="ql\indexes\ibor\cd91.hpp" />
+    <ClInclude Include="ql\indexes\ibor\HIBOR3M.hpp" />
     <ClInclude Include="ql\instruments\bonds\cpibond.hpp" />
     <ClInclude Include="ql\instruments\cpicapfloor.hpp" />
     <ClInclude Include="ql\instruments\cpiswap.hpp" />
@@ -1707,6 +1743,32 @@
     <ClInclude Include="ql\volatilitymodel.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="ds_interestrate_derivatives\cashflows\range_accrual_coupon.cpp" />
+    <ClCompile Include="ds_interestrate_derivatives\cashflows\spread_coupon.cpp" />
+    <ClCompile Include="ds_interestrate_derivatives\index\index_calculator.cpp" />
+    <ClCompile Include="ds_interestrate_derivatives\instruments\notes\callable_cpn_bond.cpp" />
+    <ClCompile Include="ds_interestrate_derivatives\instruments\notes\fixedrate_cpn_bond.cpp" />
+    <ClCompile Include="ds_interestrate_derivatives\instruments\notes\power_spread_note.cpp" />
+    <ClCompile Include="ds_interestrate_derivatives\instruments\notes\range_accrual_note.cpp" />
+    <ClCompile Include="ds_interestrate_derivatives\instruments\swaps\cross_ccy_swap.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug (static runtime)|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release (static runtime)|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="ds_interestrate_derivatives\instruments\swaps\power_spread_swap.cpp" />
+    <ClCompile Include="ds_interestrate_derivatives\instruments\swaps\range_accrual_swap.cpp" />
+    <ClCompile Include="ds_interestrate_derivatives\model\generalized_hullwhite.cpp" />
+    <ClCompile Include="ds_interestrate_derivatives\pricingengine\fdm_engine\fdm_ghw_op.cpp" />
+    <ClCompile Include="ds_interestrate_derivatives\pricingengine\fdm_engine\fdm_ghw_solver.cpp" />
+    <ClCompile Include="ds_interestrate_derivatives\pricingengine\fdm_engine\fdm_ra_engine_ghw.cpp" />
+    <ClCompile Include="ds_interestrate_derivatives\pricingengine\fdm_engine\fdm_ra_stepcondition_ghw.cpp" />
+    <ClCompile Include="ds_interestrate_derivatives\pricingengine\mc_powerspread_note_lsmc_engine.cpp" />
+    <ClCompile Include="ds_interestrate_derivatives\pricingengine\mc_powerspread_swap_lsmc_engine.cpp" />
+    <ClCompile Include="ds_interestrate_derivatives\pricingengine\mc_rangeaccrual_note_lsmc_engine.cpp" />
+    <ClCompile Include="ds_interestrate_derivatives\pricingengine\mc_rangeaccrual_swap_lsmc_engine.cpp" />
+    <ClCompile Include="ds_interestrate_derivatives\pricingengine\tree_engine\discretized_callable_bond.cpp" />
+    <ClCompile Include="ds_interestrate_derivatives\pricingengine\tree_engine\tree_callable_bond_engine.cpp" />
     <ClCompile Include="ql\cashflows\cpicoupon.cpp" />
     <ClCompile Include="ql\cashflows\cpicouponpricer.cpp" />
     <ClCompile Include="ql\experimental\exercise\rebatedexercise.cpp" />
@@ -1718,6 +1780,7 @@
     <ClCompile Include="ql\experimental\finitedifferences\fdmextoujumpop.cpp" />
     <ClCompile Include="ql\experimental\finitedifferences\fdmextoujumpsolver.cpp" />
     <ClCompile Include="ql\experimental\finitedifferences\fdmhestonfwdop.cpp" />
+    <ClCompile Include="ql\experimental\finitedifferences\fdmhullwhitemesher.cpp" />
     <ClCompile Include="ql\experimental\finitedifferences\fdmklugeextouop.cpp" />
     <ClCompile Include="ql\experimental\finitedifferences\fdmsquarerootfwdop.cpp" />
     <ClCompile Include="ql\experimental\finitedifferences\fdmvppstartlimitstepcondition.cpp" />

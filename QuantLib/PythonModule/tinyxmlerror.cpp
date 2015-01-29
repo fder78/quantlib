@@ -49,4 +49,7 @@ const char* TiXmlBase::errorString[ TiXmlBase::TIXML_ERROR_STRING_COUNT ] =
 	"Error null (0) or unexpected EOF found in input stream.",
 	"Error parsing CDATA.",
 	"Error when TiXmlDocument added to document, because TiXmlDocument can only be at the root.",
+	"Failed to open file_fopen_fail",
+	"Failed to open file_null_file_pointer",
+	"Failed to open file_fread_fail",
 };

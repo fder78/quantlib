@@ -7,60 +7,194 @@
       <Filter>tinyXML</Filter>
     </ClCompile>
     <ClCompile Include="makeResultXML.cpp" />
-    <ClCompile Include="stringUtil.cpp" />
-    <ClCompile Include="tinyxmlerror.cpp">
+    <ClCompile Include="StringUtil.cpp">
       <Filter>temp</Filter>
     </ClCompile>
-    <ClCompile Include="tinyxmlparser.cpp">
+    <ClCompile Include="YieldCurveInfoWrapper.cpp">
       <Filter>temp</Filter>
     </ClCompile>
-    <ClCompile Include="CDSParam.cpp">
-      <Filter>temp</Filter>
-    </ClCompile>
-    <ClCompile Include="CLNParam.cpp">
-      <Filter>temp</Filter>
-    </ClCompile>
-    <ClCompile Include="CurveTable.cpp">
-      <Filter>temp</Filter>
-    </ClCompile>
-    <ClCompile Include="IFunctor.cpp">
-      <Filter>temp</Filter>
-    </ClCompile>
-    <ClCompile Include="IProductParam.cpp">
-      <Filter>temp</Filter>
-    </ClCompile>
-    <ClCompile Include="ParamParseUtil.cpp">
-      <Filter>temp</Filter>
-    </ClCompile>
-    <ClCompile Include="PricingSetting.cpp">
-      <Filter>temp</Filter>
-    </ClCompile>
-    <ClCompile Include="RangeAccrualBond.cpp">
-      <Filter>temp</Filter>
-    </ClCompile>
-    <ClCompile Include="StdAfx.cpp">
-      <Filter>temp</Filter>
-    </ClCompile>
-    <ClCompile Include="tinystr.cpp">
-      <Filter>temp</Filter>
-    </ClCompile>
-    <ClCompile Include="tinyxml.cpp">
-      <Filter>temp</Filter>
-    </ClCompile>
-    <ClCompile Include="hull_white_calibration.cpp">
+    <ClCompile Include="RASpreadParam.cpp">
       <Filter>temp</Filter>
     </ClCompile>
     <ClCompile Include="yield_builder.cpp">
       <Filter>temp</Filter>
     </ClCompile>
+    <ClCompile Include="RegisterYTMFunctor.cpp">
+      <Filter>temp</Filter>
+    </ClCompile>
+    <ClCompile Include="RegisterCurveFunctor.cpp">
+      <Filter>temp</Filter>
+    </ClCompile>
+    <ClCompile Include="RemoveCurveFunctor.cpp">
+      <Filter>temp</Filter>
+    </ClCompile>
+    <ClCompile Include="IJob.cpp">
+      <Filter>temp</Filter>
+    </ClCompile>
+    <ClCompile Include="RegisterCapVolFunctor.cpp">
+      <Filter>temp</Filter>
+    </ClCompile>
+    <ClCompile Include="FunctorFactory.cpp">
+      <Filter>temp</Filter>
+    </ClCompile>
+    <ClCompile Include="YieldCurveInfoWrapperProxy.cpp">
+      <Filter>temp</Filter>
+    </ClCompile>
+    <ClCompile Include="RegisterSwaptionFunctor.cpp">
+      <Filter>temp</Filter>
+    </ClCompile>
+    <ClCompile Include="RangeAccrualDLLSingleton.cpp">
+      <Filter>temp</Filter>
+    </ClCompile>
+    <ClCompile Include="PricingSetting.cpp">
+      <Filter>temp</Filter>
+    </ClCompile>
+    <ClCompile Include="tinyxmlerror.cpp">
+      <Filter>temp</Filter>
+    </ClCompile>
+    <ClCompile Include="RunPricingFunctor.cpp">
+      <Filter>temp</Filter>
+    </ClCompile>
+    <ClCompile Include="tinystr.cpp">
+      <Filter>temp</Filter>
+    </ClCompile>
+    <ClCompile Include="RemoteXMLJob.cpp">
+      <Filter>temp</Filter>
+    </ClCompile>
+    <ClCompile Include="RAMCParam.cpp">
+      <Filter>temp</Filter>
+    </ClCompile>
+    <ClCompile Include="Main.cpp">
+      <Filter>temp</Filter>
+    </ClCompile>
+    <ClCompile Include="ShiftOption.cpp">
+      <Filter>temp</Filter>
+    </ClCompile>
+    <ClCompile Include="RACMSParam.cpp">
+      <Filter>temp</Filter>
+    </ClCompile>
+    <ClCompile Include="RAUsingProcessParam.cpp">
+      <Filter>temp</Filter>
+    </ClCompile>
+    <ClCompile Include="FXCurveInfoWrapper.cpp">
+      <Filter>temp</Filter>
+    </ClCompile>
+    <ClCompile Include="RAFDMParam.cpp">
+      <Filter>temp</Filter>
+    </ClCompile>
     <ClCompile Include="yield_curve_bootstrapping.cpp">
+      <Filter>temp</Filter>
+    </ClCompile>
+    <ClCompile Include="IProductParam.cpp">
+      <Filter>temp</Filter>
+    </ClCompile>
+    <ClCompile Include="CalculationProxy.cpp">
+      <Filter>temp</Filter>
+    </ClCompile>
+    <ClCompile Include="FXDigitalParam.cpp">
+      <Filter>temp</Filter>
+    </ClCompile>
+    <ClCompile Include="ParamParseUtil.cpp">
+      <Filter>temp</Filter>
+    </ClCompile>
+    <ClCompile Include="XMLStream.cpp">
+      <Filter>temp</Filter>
+    </ClCompile>
+    <ClCompile Include="RASingleTreeParam.cpp">
+      <Filter>temp</Filter>
+    </ClCompile>
+    <ClCompile Include="FixedRateBondParam.cpp">
+      <Filter>temp</Filter>
+    </ClCompile>
+    <ClCompile Include="CLNParam.cpp">
+      <Filter>temp</Filter>
+    </ClCompile>
+    <ClCompile Include="CDSParam.cpp">
+      <Filter>temp</Filter>
+    </ClCompile>
+    <ClCompile Include="InterestRateCurveInfoWrapper.cpp">
+      <Filter>temp</Filter>
+    </ClCompile>
+    <ClCompile Include="BloombergCaller.cpp">
+      <Filter>temp</Filter>
+    </ClCompile>
+    <ClCompile Include="IRProductJob.cpp">
+      <Filter>temp</Filter>
+    </ClCompile>
+    <ClCompile Include="SwaptionParam.cpp">
+      <Filter>temp</Filter>
+    </ClCompile>
+    <ClCompile Include="VanillaSwapParam.cpp">
       <Filter>temp</Filter>
     </ClCompile>
     <ClCompile Include="CQuery.cpp">
       <Filter>temp</Filter>
     </ClCompile>
-    <ClCompile Include="xccyratehelper.cpp">
+    <ClCompile Include="RADaishinParam.cpp">
       <Filter>temp</Filter>
+    </ClCompile>
+    <ClCompile Include="RAKAPParam.cpp">
+      <Filter>temp</Filter>
+    </ClCompile>
+    <ClCompile Include="CurveTable.cpp">
+      <Filter>temp</Filter>
+    </ClCompile>
+    <ClCompile Include="CapFloorParam.cpp">
+      <Filter>temp</Filter>
+    </ClCompile>
+    <ClCompile Include="CurveTableUtil.cpp">
+      <Filter>temp</Filter>
+    </ClCompile>
+    <ClCompile Include="PowerSpreadParam.cpp">
+      <Filter>temp</Filter>
+    </ClCompile>
+    <ClCompile Include="IRProductParam.cpp">
+      <Filter>temp</Filter>
+    </ClCompile>
+    <ClCompile Include="tinyxmlparser.cpp">
+      <Filter>temp</Filter>
+    </ClCompile>
+    <ClCompile Include="tinyxml.cpp">
+      <Filter>temp</Filter>
+    </ClCompile>
+    <ClCompile Include="IFunctor.cpp">
+      <Filter>temp</Filter>
+    </ClCompile>
+    <ClCompile Include="StdAfx.cpp">
+      <Filter>temp</Filter>
+    </ClCompile>
+    <ClCompile Include="pricing_functions\power_spread_note.cpp">
+      <Filter>pricing_functions</Filter>
+    </ClCompile>
+    <ClCompile Include="pricing_functions\power_spread_swap.cpp">
+      <Filter>pricing_functions</Filter>
+    </ClCompile>
+    <ClCompile Include="pricing_functions\range_accrual_note_tree.cpp">
+      <Filter>pricing_functions</Filter>
+    </ClCompile>
+    <ClCompile Include="pricing_functions\single_hull_white_calibration.cpp">
+      <Filter>pricing_functions</Filter>
+    </ClCompile>
+    <ClCompile Include="pricing_functions\vanilla_swap.cpp">
+      <Filter>pricing_functions</Filter>
+    </ClCompile>
+    <ClCompile Include="pricing_functions\cap_floor_swaption.cpp">
+      <Filter>pricing_functions</Filter>
+    </ClCompile>
+    <ClCompile Include="pricing_functions\daishin_power_spread_note.cpp">
+      <Filter>pricing_functions</Filter>
+    </ClCompile>
+    <ClCompile Include="pricing_functions\daishin_power_spread_swap.cpp">
+      <Filter>pricing_functions</Filter>
+    </ClCompile>
+    <ClCompile Include="pricing_functions\dual_rangeaccrual.cpp">
+      <Filter>pricing_functions</Filter>
+    </ClCompile>
+    <ClCompile Include="pricing_functions\dual_rangeaccrual_swap.cpp">
+      <Filter>pricing_functions</Filter>
+    </ClCompile>
+    <ClCompile Include="pricing_functions\hull_white_calibration.cpp">
+      <Filter>pricing_functions</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -69,12 +203,136 @@
       <Filter>tinyXML</Filter>
     </ClInclude>
     <ClInclude Include="makeResultXML.h" />
-    <ClInclude Include="perProcessSingleton.h" />
-    <ClInclude Include="stringUtil.h" />
-    <ClInclude Include="tinyxml.h">
+    <ClInclude Include="RunPricingFunctor.h">
       <Filter>temp</Filter>
     </ClInclude>
-    <ClInclude Include="XMLValue.h">
+    <ClInclude Include="RegisterCurveFunctor.h">
+      <Filter>temp</Filter>
+    </ClInclude>
+    <ClInclude Include="RegisterSwaptionFunctor.h">
+      <Filter>temp</Filter>
+    </ClInclude>
+    <ClInclude Include="IFunctor.h">
+      <Filter>temp</Filter>
+    </ClInclude>
+    <ClInclude Include="RASpreadParam.h">
+      <Filter>temp</Filter>
+    </ClInclude>
+    <ClInclude Include="StdAfx.h">
+      <Filter>temp</Filter>
+    </ClInclude>
+    <ClInclude Include="Main.h">
+      <Filter>temp</Filter>
+    </ClInclude>
+    <ClInclude Include="RACMSParam.h">
+      <Filter>temp</Filter>
+    </ClInclude>
+    <ClInclude Include="RAMCParam.h">
+      <Filter>temp</Filter>
+    </ClInclude>
+    <ClInclude Include="RAUsingProcessParam.h">
+      <Filter>temp</Filter>
+    </ClInclude>
+    <ClInclude Include="FiccDerivatives_DLL.h">
+      <Filter>temp</Filter>
+    </ClInclude>
+    <ClInclude Include="IJob.h">
+      <Filter>temp</Filter>
+    </ClInclude>
+    <ClInclude Include="RAFDMParam.h">
+      <Filter>temp</Filter>
+    </ClInclude>
+    <ClInclude Include="FunctorFactory.h">
+      <Filter>temp</Filter>
+    </ClInclude>
+    <ClInclude Include="HIBOR3M.hpp">
+      <Filter>temp</Filter>
+    </ClInclude>
+    <ClInclude Include="PerProcessSingleton.h">
+      <Filter>temp</Filter>
+    </ClInclude>
+    <ClInclude Include="GlobalSetting.h">
+      <Filter>temp</Filter>
+    </ClInclude>
+    <ClInclude Include="cd91.hpp">
+      <Filter>temp</Filter>
+    </ClInclude>
+    <ClInclude Include="yield_builder.hpp">
+      <Filter>temp</Filter>
+    </ClInclude>
+    <ClInclude Include="CalculationProxy.h">
+      <Filter>temp</Filter>
+    </ClInclude>
+    <ClInclude Include="RASingleTreeParam.h">
+      <Filter>temp</Filter>
+    </ClInclude>
+    <ClInclude Include="FXDigitalParam.h">
+      <Filter>temp</Filter>
+    </ClInclude>
+    <ClInclude Include="RemoteXMLJob.h">
+      <Filter>temp</Filter>
+    </ClInclude>
+    <ClInclude Include="YieldCurveInfoWrapperProxy.h">
+      <Filter>temp</Filter>
+    </ClInclude>
+    <ClInclude Include="YieldCurveInfoWrapper.h">
+      <Filter>temp</Filter>
+    </ClInclude>
+    <ClInclude Include="RangeAccrualDLLSingleton.h">
+      <Filter>temp</Filter>
+    </ClInclude>
+    <ClInclude Include="PricingSetting.h">
+      <Filter>temp</Filter>
+    </ClInclude>
+    <ClInclude Include="BloombergCaller.h">
+      <Filter>temp</Filter>
+    </ClInclude>
+    <ClInclude Include="RADaishinParam.h">
+      <Filter>temp</Filter>
+    </ClInclude>
+    <ClInclude Include="IProductParam.h">
+      <Filter>temp</Filter>
+    </ClInclude>
+    <ClInclude Include="EnumParser.h">
+      <Filter>temp</Filter>
+    </ClInclude>
+    <ClInclude Include="yield_curve_bootstrapping.hpp">
+      <Filter>temp</Filter>
+    </ClInclude>
+    <ClInclude Include="FXCurveInfoWrapper.h">
+      <Filter>temp</Filter>
+    </ClInclude>
+    <ClInclude Include="ParamParseUtil.h">
+      <Filter>temp</Filter>
+    </ClInclude>
+    <ClInclude Include="ShiftOption.h">
+      <Filter>temp</Filter>
+    </ClInclude>
+    <ClInclude Include="FixedRateBondParam.h">
+      <Filter>temp</Filter>
+    </ClInclude>
+    <ClInclude Include="XMLStream.h">
+      <Filter>temp</Filter>
+    </ClInclude>
+    <ClInclude Include="CurveTableUtil.h">
+      <Filter>temp</Filter>
+    </ClInclude>
+    <ClInclude Include="CQuery.h">
+      <Filter>temp</Filter>
+    </ClInclude>
+    <ClInclude Include="InterestRateCurveInfoWrapper.h">
+      <Filter>temp</Filter>
+    </ClInclude>
+    <ClInclude Include="VanillaSwapParam.h">
+      <Filter>temp</Filter>
+    </ClInclude>
+    <ClInclude Include="SwaptionParam.h">
+      <Filter>temp</Filter>
+    </ClInclude>
+    <ClInclude Include="CapFloorParam.h">
+      <Filter>temp</Filter>
+    </ClInclude>
+    <ClInclude Include="IRProductParam.h">
       <Filter>temp</Filter>
     </ClInclude>
     <ClInclude Include="CDSParam.h">
@@ -83,56 +341,77 @@
     <ClInclude Include="CLNParam.h">
       <Filter>temp</Filter>
     </ClInclude>
+    <ClInclude Include="PowerSpreadParam.h">
+      <Filter>temp</Filter>
+    </ClInclude>
+    <ClInclude Include="IRProductJob.h">
+      <Filter>temp</Filter>
+    </ClInclude>
+    <ClInclude Include="RAKAPParam.h">
+      <Filter>temp</Filter>
+    </ClInclude>
+    <ClInclude Include="XMLValue.h">
+      <Filter>temp</Filter>
+    </ClInclude>
     <ClInclude Include="CurveTable.h">
-      <Filter>temp</Filter>
-    </ClInclude>
-    <ClInclude Include="IFunctor.h">
-      <Filter>temp</Filter>
-    </ClInclude>
-    <ClInclude Include="IProductParam.h">
-      <Filter>temp</Filter>
-    </ClInclude>
-    <ClInclude Include="ParamParseUtil.h">
-      <Filter>temp</Filter>
-    </ClInclude>
-    <ClInclude Include="PricingSetting.h">
       <Filter>temp</Filter>
     </ClInclude>
     <ClInclude Include="ProductIndex.h">
       <Filter>temp</Filter>
     </ClInclude>
-    <ClInclude Include="RangeAccrualBond.h">
-      <Filter>temp</Filter>
-    </ClInclude>
-    <ClInclude Include="StdAfx.h">
-      <Filter>temp</Filter>
-    </ClInclude>
-    <ClInclude Include="structuredproduct_ir.h">
+    <ClInclude Include="StringUtil.h">
       <Filter>temp</Filter>
     </ClInclude>
     <ClInclude Include="tinystr.h">
       <Filter>temp</Filter>
     </ClInclude>
-    <ClInclude Include="hull_white_calibration.hpp">
+    <ClInclude Include="structuredproduct_ir.h">
       <Filter>temp</Filter>
     </ClInclude>
-    <ClInclude Include="yield_curve_bootstrapping.hpp">
+    <ClInclude Include="tinyxml.h">
       <Filter>temp</Filter>
     </ClInclude>
-    <ClInclude Include="yield_builder.hpp">
+    <ClInclude Include="RegisterCapVolFunctor.h">
       <Filter>temp</Filter>
     </ClInclude>
-    <ClInclude Include="GlobalSetting.h">
+    <ClInclude Include="RemoveCurveFunctor.h">
       <Filter>temp</Filter>
     </ClInclude>
-    <ClInclude Include="CQuery.h">
+    <ClInclude Include="RegisterYTMFunctor.h">
       <Filter>temp</Filter>
     </ClInclude>
-    <ClInclude Include="EnumParser.h">
-      <Filter>temp</Filter>
+    <ClInclude Include="pricing_functions\power_spread_note.hpp">
+      <Filter>pricing_functions</Filter>
     </ClInclude>
-    <ClInclude Include="xccyratehelper.hpp">
-      <Filter>temp</Filter>
+    <ClInclude Include="pricing_functions\power_spread_swap.hpp">
+      <Filter>pricing_functions</Filter>
+    </ClInclude>
+    <ClInclude Include="pricing_functions\range_accrual_note_tree.hpp">
+      <Filter>pricing_functions</Filter>
+    </ClInclude>
+    <ClInclude Include="pricing_functions\single_hull_white_calibration.hpp">
+      <Filter>pricing_functions</Filter>
+    </ClInclude>
+    <ClInclude Include="pricing_functions\vanilla_swap.hpp">
+      <Filter>pricing_functions</Filter>
+    </ClInclude>
+    <ClInclude Include="pricing_functions\cap_floor_swaption.hpp">
+      <Filter>pricing_functions</Filter>
+    </ClInclude>
+    <ClInclude Include="pricing_functions\daishin_power_spread_note.hpp">
+      <Filter>pricing_functions</Filter>
+    </ClInclude>
+    <ClInclude Include="pricing_functions\daishin_power_spread_swap.hpp">
+      <Filter>pricing_functions</Filter>
+    </ClInclude>
+    <ClInclude Include="pricing_functions\dual_rangeaccrual.hpp">
+      <Filter>pricing_functions</Filter>
+    </ClInclude>
+    <ClInclude Include="pricing_functions\dual_rangeaccrual_swap.hpp">
+      <Filter>pricing_functions</Filter>
+    </ClInclude>
+    <ClInclude Include="pricing_functions\hull_white_calibration.hpp">
+      <Filter>pricing_functions</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -150,6 +429,9 @@
     </Filter>
     <Filter Include="temp">
       <UniqueIdentifier>{c946e462-32b0-48a5-97c8-b1e2b9a26b61}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="instruments">
+      <UniqueIdentifier>{30bd4f90-2e3b-4cf9-86e6-9d21eab65b5a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

@@ -8,7 +8,7 @@ class EnumParser : public PerProcessSingleton<Parser>
 public:
 	EnumParser() { static_cast<Parser*>( this )->BuildEnumMap(); }
 
-	static EnumType ParseEnum( const std::wstring& enum_name, bool ignoreError = false, typename EnumType defaultVal = EnumType() )
+	static EnumType ParseEnum( const std::wstring& enum_name )
 	{
 		EnumParser<Parser, EnumType>& parser = instance();
 		std::wstring trimmedEnumName( enum_name );
@@ -16,12 +16,8 @@ public:
 		EnumMap::const_iterator iter = parser.m_enumMap.find( trimmedEnumName );
 		if( iter == parser.m_enumMap.end() )
 		{
-			if( !ignoreError )
-			{
-				QL_ASSERT( false, ::ToString( enum_name ) + "(은/는) 처리가능한 종류가 아닙니다." );
-			}
-
-			return defaultVal;
+			QL_ASSERT( false, ::ToString( enum_name ) + "(은/는) 처리가능한 종류가 아닙니다." );
+			return EnumType();
 		}
 
 		return iter->second;

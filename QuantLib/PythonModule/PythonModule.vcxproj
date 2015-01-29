@@ -70,18 +70,21 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;PYTHONMODULE_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>.;..;C:\Anaconda\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <DisableSpecificWarnings>4819;4996</DisableSpecificWarnings>
+      <AdditionalIncludeDirectories>E:\xmlrpc-c-master\stable\include;.;..;C:\Anaconda\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4819;4996;4251</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>..\lib;C:\Anaconda\libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>E:\xmlrpc-c-master\stable\bin\Release-Static-Win32;..\lib;C:\Anaconda\libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="BloombergCaller.cpp" />
+    <ClCompile Include="CalculationProxy.cpp" />
+    <ClCompile Include="CapFloorParam.cpp" />
     <ClCompile Include="CDSParam.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
@@ -92,27 +95,75 @@
     </ClCompile>
     <ClCompile Include="CQuery.cpp" />
     <ClCompile Include="CurveTable.cpp" />
-    <ClCompile Include="hull_white_calibration.cpp" />
+    <ClCompile Include="CurveTableUtil.cpp" />
+    <ClCompile Include="FixedRateBondParam.cpp" />
+    <ClCompile Include="FunctorFactory.cpp" />
+    <ClCompile Include="FXCurveInfoWrapper.cpp" />
+    <ClCompile Include="FXDigitalParam.cpp" />
     <ClCompile Include="IFunctor.cpp" />
+    <ClCompile Include="IJob.cpp" />
+    <ClCompile Include="InterestRateCurveInfoWrapper.cpp" />
     <ClCompile Include="IProductParam.cpp" />
+    <ClCompile Include="IRProductJob.cpp" />
+    <ClCompile Include="IRProductParam.cpp" />
+    <ClCompile Include="Main.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="Main_python_export.cpp" />
     <ClCompile Include="makeResultXML.cpp" />
     <ClCompile Include="ParamParseUtil.cpp" />
+    <ClCompile Include="PowerSpreadParam.cpp" />
     <ClCompile Include="PricingSetting.cpp" />
+    <ClCompile Include="pricing_functions\cap_floor_swaption.cpp" />
+    <ClCompile Include="pricing_functions\daishin_power_spread_note.cpp" />
+    <ClCompile Include="pricing_functions\daishin_power_spread_swap.cpp" />
+    <ClCompile Include="pricing_functions\dual_rangeaccrual.cpp" />
+    <ClCompile Include="pricing_functions\dual_rangeaccrual_swap.cpp" />
+    <ClCompile Include="pricing_functions\hull_white_calibration.cpp" />
+    <ClCompile Include="pricing_functions\power_spread_note.cpp" />
+    <ClCompile Include="pricing_functions\power_spread_swap.cpp" />
+    <ClCompile Include="pricing_functions\range_accrual_note_tree.cpp" />
+    <ClCompile Include="pricing_functions\single_hull_white_calibration.cpp" />
+    <ClCompile Include="pricing_functions\vanilla_swap.cpp" />
     <ClCompile Include="pyCall.cpp" />
-    <ClCompile Include="RangeAccrualBond.cpp" />
+    <ClCompile Include="RACMSParam.cpp" />
+    <ClCompile Include="RADaishinParam.cpp" />
+    <ClCompile Include="RAFDMParam.cpp" />
+    <ClCompile Include="RAKAPParam.cpp" />
+    <ClCompile Include="RAMCParam.cpp" />
+    <ClCompile Include="RangeAccrualDLLSingleton.cpp" />
+    <ClCompile Include="RASingleTreeParam.cpp" />
+    <ClCompile Include="RASpreadParam.cpp" />
+    <ClCompile Include="RAUsingProcessParam.cpp" />
+    <ClCompile Include="RegisterCapVolFunctor.cpp" />
+    <ClCompile Include="RegisterCurveFunctor.cpp" />
+    <ClCompile Include="RegisterSwaptionFunctor.cpp" />
+    <ClCompile Include="RegisterYTMFunctor.cpp" />
+    <ClCompile Include="RemoteXMLJob.cpp" />
+    <ClCompile Include="RemoveCurveFunctor.cpp" />
+    <ClCompile Include="RunPricingFunctor.cpp" />
+    <ClCompile Include="ShiftOption.cpp" />
     <ClCompile Include="StdAfx.cpp" />
-    <ClCompile Include="stringUtil.cpp" />
+    <ClCompile Include="StringUtil.cpp" />
+    <ClCompile Include="SwaptionParam.cpp" />
     <ClCompile Include="tinystr.cpp" />
     <ClCompile Include="tinyxml.cpp" />
     <ClCompile Include="tinyxmlerror.cpp" />
     <ClCompile Include="tinyxmlparser.cpp" />
     <ClCompile Include="tinyXML\tinyxml2.cpp" />
-    <ClCompile Include="xccyratehelper.cpp" />
+    <ClCompile Include="VanillaSwapParam.cpp" />
+    <ClCompile Include="XMLStream.cpp" />
+    <ClCompile Include="YieldCurveInfoWrapper.cpp" />
+    <ClCompile Include="YieldCurveInfoWrapperProxy.cpp" />
     <ClCompile Include="yield_builder.cpp" />
     <ClCompile Include="yield_curve_bootstrapping.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BloombergCaller.h" />
+    <ClInclude Include="CalculationProxy.h" />
+    <ClInclude Include="CapFloorParam.h" />
+    <ClInclude Include="cd91.hpp" />
     <ClInclude Include="CDSParam.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
@@ -123,26 +174,72 @@
     </ClInclude>
     <ClInclude Include="CQuery.h" />
     <ClInclude Include="CurveTable.h" />
+    <ClInclude Include="CurveTableUtil.h" />
     <ClInclude Include="EnumParser.h" />
+    <ClInclude Include="FiccDerivatives_DLL.h" />
+    <ClInclude Include="FixedRateBondParam.h" />
+    <ClInclude Include="FunctorFactory.h" />
+    <ClInclude Include="FXCurveInfoWrapper.h" />
+    <ClInclude Include="FXDigitalParam.h" />
     <ClInclude Include="GlobalSetting.h" />
-    <ClInclude Include="hull_white_calibration.hpp" />
+    <ClInclude Include="HIBOR3M.hpp" />
     <ClInclude Include="IFunctor.h" />
+    <ClInclude Include="IJob.h" />
+    <ClInclude Include="InterestRateCurveInfoWrapper.h" />
     <ClInclude Include="IProductParam.h" />
+    <ClInclude Include="IRProductJob.h" />
+    <ClInclude Include="IRProductParam.h" />
+    <ClInclude Include="Main.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="makeResultXML.h" />
     <ClInclude Include="ParamParseUtil.h" />
-    <ClInclude Include="perProcessSingleton.h" />
+    <ClInclude Include="PerProcessSingleton.h" />
+    <ClInclude Include="PowerSpreadParam.h" />
     <ClInclude Include="PricingSetting.h" />
+    <ClInclude Include="pricing_functions\cap_floor_swaption.hpp" />
+    <ClInclude Include="pricing_functions\daishin_power_spread_note.hpp" />
+    <ClInclude Include="pricing_functions\daishin_power_spread_swap.hpp" />
+    <ClInclude Include="pricing_functions\dual_rangeaccrual.hpp" />
+    <ClInclude Include="pricing_functions\dual_rangeaccrual_swap.hpp" />
+    <ClInclude Include="pricing_functions\hull_white_calibration.hpp" />
+    <ClInclude Include="pricing_functions\power_spread_note.hpp" />
+    <ClInclude Include="pricing_functions\power_spread_swap.hpp" />
+    <ClInclude Include="pricing_functions\range_accrual_note_tree.hpp" />
+    <ClInclude Include="pricing_functions\single_hull_white_calibration.hpp" />
+    <ClInclude Include="pricing_functions\vanilla_swap.hpp" />
     <ClInclude Include="ProductIndex.h" />
     <ClInclude Include="pyCall.h" />
-    <ClInclude Include="RangeAccrualBond.h" />
+    <ClInclude Include="RACMSParam.h" />
+    <ClInclude Include="RADaishinParam.h" />
+    <ClInclude Include="RAFDMParam.h" />
+    <ClInclude Include="RAKAPParam.h" />
+    <ClInclude Include="RAMCParam.h" />
+    <ClInclude Include="RangeAccrualDLLSingleton.h" />
+    <ClInclude Include="RASingleTreeParam.h" />
+    <ClInclude Include="RASpreadParam.h" />
+    <ClInclude Include="RAUsingProcessParam.h" />
+    <ClInclude Include="RegisterCapVolFunctor.h" />
+    <ClInclude Include="RegisterCurveFunctor.h" />
+    <ClInclude Include="RegisterSwaptionFunctor.h" />
+    <ClInclude Include="RegisterYTMFunctor.h" />
+    <ClInclude Include="RemoteXMLJob.h" />
+    <ClInclude Include="RemoveCurveFunctor.h" />
+    <ClInclude Include="RunPricingFunctor.h" />
+    <ClInclude Include="ShiftOption.h" />
     <ClInclude Include="StdAfx.h" />
-    <ClInclude Include="stringUtil.h" />
+    <ClInclude Include="StringUtil.h" />
     <ClInclude Include="structuredproduct_ir.h" />
+    <ClInclude Include="SwaptionParam.h" />
     <ClInclude Include="tinystr.h" />
     <ClInclude Include="tinyxml.h" />
     <ClInclude Include="tinyXML\tinyxml2.h" />
-    <ClInclude Include="xccyratehelper.hpp" />
+    <ClInclude Include="VanillaSwapParam.h" />
+    <ClInclude Include="XMLStream.h" />
     <ClInclude Include="XMLValue.h" />
+    <ClInclude Include="YieldCurveInfoWrapper.h" />
+    <ClInclude Include="YieldCurveInfoWrapperProxy.h" />
     <ClInclude Include="yield_builder.hpp" />
     <ClInclude Include="yield_curve_bootstrapping.hpp" />
   </ItemGroup>

@@ -46,6 +46,9 @@ namespace QuantLib {
         Real stdDeviation(Time t0, Real x0, Time dt) const;
         Real variance(Time t0, Real x0, Time dt) const;
 
+		//added by K.H.Hwang
+		//2012.7.24
+		boost::shared_ptr<YieldTermStructure> yieldTermStructure() const { return h_.currentLink(); }
         Real a() const;
         Real sigma() const;
         Real alpha(Time t) const;

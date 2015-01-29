@@ -1,8 +1,7 @@
 #pragma once
 
-#include "stringUtil.h"
+#include "StringUtil.h"
 #include "tinyxml.h"
-
 
 // By Hyun Chul
 class XMLValue
@@ -36,13 +35,27 @@ public:
 	Real GetValueT( const Real& ) const
 	{
 		QL_ASSERT( m_type == L"double", m_param + "의 타입이 double이 아닙니다." );
-		return boost::lexical_cast<Real>( m_value );
+		try
+		{
+			return boost::lexical_cast<Real>( m_value );
+		}
+		catch (...)
+		{
+			QL_ASSERT( false, m_param + "에서 lexical cast에러가 발생하였습니다." );
+		}
 	}
 
 	int GetValueT( const int& ) const
 	{
 		QL_ASSERT( m_type == L"double", m_param + "의 타입이 double이 아닙니다." );
-		return boost::lexical_cast<int>( m_value );
+		try
+		{
+			return boost::lexical_cast<int>( m_value );
+		}
+		catch (...)
+		{
+			QL_ASSERT( false, m_param + "에서 lexical cast에러가 발생하였습니다." );
+		}
 	}
 
 	bool GetValueT( const bool& ) const
@@ -97,6 +110,29 @@ private:
 	const TiXmlElement* m_record;
 };
 
+// = 연산자에 Str 암시적변환이 잘 안되어서 만듦
+class XMLStrValue
+{
+public:
+	XMLStrValue( const TiXmlElement* record, const std::string& param )
+		: m_value( record, param )
+	{
+	}
+
+	operator std::wstring() const
+	{
+		return GetValue();
+	}
+
+	std::wstring GetValue() const
+	{
+		return m_value.GetValueT( std::wstring() );
+	}
+
+private:
+	XMLValue m_value;
+};
+
 inline bool operator == ( const XMLValue& lhs, const wchar_t* rhs )
 {
 	return lhs.GetValue<std::wstring>() == std::wstring( rhs );
@@ -118,6 +154,22 @@ template<typename T>
 bool operator != ( const XMLValue& lhs, const T& rhs )
 {
 	return lhs.GetValue<T>() != rhs;
+}
+
+template<typename T>
+bool operator > ( const XMLValue& lhs, const T& rhs )
+{
+	return lhs.GetValue<T>() > rhs;
+}
+
+inline bool operator == ( const XMLStrValue& lhs, const std::wstring& rhs )
+{
+	return lhs.GetValue() == rhs;
+}
+
+inline bool operator != ( const XMLStrValue& lhs, const std::wstring& rhs )
+{
+	return lhs.GetValue() != rhs;
 }
 
 inline std::string ConvertDateFormat( const Date& bloombergFormat )

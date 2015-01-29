@@ -43,7 +43,10 @@ distribution.
 #define DEBUG
 #endif
 
+#ifndef TIXML_USE_STL
 #define TIXML_USE_STL
+#endif
+
 #ifdef TIXML_USE_STL
 	#include <string>
  	#include <iostream>
@@ -280,6 +283,9 @@ public:
 		TIXML_ERROR_EMBEDDED_NULL,
 		TIXML_ERROR_PARSING_CDATA,
 		TIXML_ERROR_DOCUMENT_TOP_ONLY,
+		TIXML_ERROR_FOPEN_FAIL,
+		TIXML_ERROR_NULL_FILE_POINTER,
+		TIXML_ERROR_FREAD_FAIL,
 
 		TIXML_ERROR_STRING_COUNT
 	};

@@ -13,11 +13,14 @@
 #include "PricingSetting.h"
 
 #include "yield_builder.hpp"
-//#include "../../Daishin_Credit_Derivatives/credit_result.hpp"
-//#include "../../Daishin_Credit_Derivatives/cds_singlename.hpp"
-//#include "../../Daishin_Credit_Derivatives/cds_NtD.hpp"
 
-void CDSParam::SetDataImpl( const TiXmlElement* record )
+#include "InterestRateCurveInfoWrapper.h"
+
+#include "../../Daishin_Credit_Derivatives/credit_result.hpp"
+#include "../../Daishin_Credit_Derivatives/cds_singlename.hpp"
+#include "../../Daishin_Credit_Derivatives/cds_NtD.hpp"
+
+void CDSParam::SetDataImpl( TiXmlElement* record )
 {
 	m_todaysDate = PricingSetting::instance().GetEvaluationDate();
 	m_book = XMLValue( record, PI_Book ).GetValue<const char*>();
@@ -62,8 +65,8 @@ void CDSParam::SetDataImpl( const TiXmlElement* record )
 	m_nextToLastDate = XMLValue( record, PI_NextToLastdate );
 
 	// Market Info
-	m_tsCurve_protection = Handle<YieldTermStructure>( ::build_yield_curve( *CurveTable::instance().GetYieldCurve( XMLValue( record, PI_DiscountProtection ) )->GetCurveData() ) );
-	m_tsCurve_premium = Handle<YieldTermStructure>( ::build_yield_curve( *CurveTable::instance().GetYieldCurve( XMLValue( record, PI_DiscountPremium ) )->GetCurveData() ) );
+	m_tsCurve_protection = Handle<YieldTermStructure>( ::build_yield_curve( *boost::dynamic_pointer_cast<InterestRateCurveInfoWrapper>( CurveTable::instance().GetYieldCurve( XMLValue( record, PI_DiscountProtection ), ShiftOption::ShiftNothing ) )->GetCurveData() ) );
+	m_tsCurve_premium = Handle<YieldTermStructure>( ::build_yield_curve( *boost::dynamic_pointer_cast<InterestRateCurveInfoWrapper>( CurveTable::instance().GetYieldCurve( XMLValue( record, PI_DiscountPremium ), ShiftOption::ShiftNothing ) )->GetCurveData() ) );
 
 	XMLValue fx1val = XMLValue( record, PI_FXSpot1 );
 	XMLValue fx2val = XMLValue( record, PI_FXSpot2 );
@@ -72,7 +75,7 @@ void CDSParam::SetDataImpl( const TiXmlElement* record )
 
 	if( fx1val.GetType() == L"string" )
 	{
-		fx1 = CurveTable::instance().GetFXCurve( XMLValue( record, PI_FXSpot1 ) )->m_fwdValue.front();
+		fx1 = CurveTable::instance().GetFXCurve( XMLValue( record, PI_FXSpot1 ), ShiftOption::ShiftNothing )->fwdValue.front();
 	}
 	else
 	{
@@ -81,7 +84,7 @@ void CDSParam::SetDataImpl( const TiXmlElement* record )
 
 	if( fx2val.GetType() == L"string" )
 	{
-		fx2 = CurveTable::instance().GetFXCurve( XMLValue( record, PI_FXSpot2 ) )->m_fwdValue.front();
+		fx2 = CurveTable::instance().GetFXCurve( XMLValue( record, PI_FXSpot2 ), ShiftOption::ShiftNothing )->fwdValue.front();
 	}
 	else
 	{
@@ -108,8 +111,8 @@ void CDSParam::SetDataImpl( const TiXmlElement* record )
 
 		boost::shared_ptr<CDSCurveData> cdsPremium = CurveTable::instance().GetCDSCurve( trimmed );
 
-		m_tenors.push_back( cdsPremium->m_tenors );
-		m_quoted_spreads.push_back( cdsPremium->m_quoted_spreads );
+		m_tenors.push_back( cdsPremium->tenors );
+		m_quoted_spreads.push_back( cdsPremium->quotedSpreads );
 	}
 }
 
@@ -117,15 +120,15 @@ void CDSParam::Calculate()
 {
 	CDSPricingResult res = CalcRes();
 
-	GetResultObject()->InsertEndChild( TiXmlElement( "price" ) )->ToElement()->SetDoubleAttribute( "value", res.price );
-	GetResultObject()->InsertEndChild( TiXmlElement( "fairSpread" ) )->ToElement()->SetDoubleAttribute( "value", res.fairSpread );
-	GetResultObject()->InsertEndChild( TiXmlElement( "defaultLeg" ) )->ToElement()->SetDoubleAttribute( "value", res.defaultLeg );
-	GetResultObject()->InsertEndChild( TiXmlElement( "coupontLeg" ) )->ToElement()->SetDoubleAttribute( "value", res.couponLeg );
+	GetResultObject()->InsertEndChild( TiXmlElement( "price" ) )->ToElement()->SetAttribute( "value", ::ToString( res.price ) );
+	GetResultObject()->InsertEndChild( TiXmlElement( "fairSpread" ) )->ToElement()->SetAttribute( "value", ::ToString( res.fairSpread ) );
+	GetResultObject()->InsertEndChild( TiXmlElement( "defaultLeg" ) )->ToElement()->SetAttribute( "value", ::ToString( res.defaultLeg ) );
+	GetResultObject()->InsertEndChild( TiXmlElement( "coupontLeg" ) )->ToElement()->SetAttribute( "value", ::ToString( res.couponLeg ) );
 
 	{
 		TiXmlElement notional1( "notional1" );
 
-		notional1.SetDoubleAttribute( "value", m_nominal.first );
+		notional1.SetAttribute( "value", ::ToString( m_nominal.first ) );
 		notional1.SetAttribute( "type", "double" );
 
 		GetResultObject()->InsertEndChild( notional1 );
@@ -180,7 +183,7 @@ void CDSParam::Calculate()
 		{
 			TiXmlElement fxDelta( "fxDelta" );
 
-			fxDelta.SetDoubleAttribute( "value", delta / ( m_fxSpot.first * 1.01 * 0.01 ) );
+			fxDelta.SetAttribute( "value", ::ToString( delta / ( m_fxSpot.first * 1.01 * 0.01 ) ) );
 			fxDelta.SetAttribute( "type", "double" );
 
 			GetResultObject()->InsertEndChild( fxDelta );
@@ -189,7 +192,7 @@ void CDSParam::Calculate()
 		{
 			TiXmlElement fxGamma( "fxGamma" );
 
-			fxGamma.SetDoubleAttribute( "value", gamma / ( m_fxSpot.first * 1.01 * 0.01 ) );
+			fxGamma.SetAttribute( "value", ::ToString( gamma / ( m_fxSpot.first * 1.01 * 0.01 ) ) );
 			fxGamma.SetAttribute( "type", "double" );
 
 			GetResultObject()->InsertEndChild( fxGamma );

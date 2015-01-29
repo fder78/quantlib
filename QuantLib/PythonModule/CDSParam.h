@@ -10,7 +10,7 @@ namespace QuantLib
 class CDSParam : public IProductParam
 {
 public:
-	virtual void SetDataImpl( const TiXmlElement* record ) override;
+	virtual void SetDataImpl( TiXmlElement* record ) override;
 
 	Date GetTodaysDate() const { return m_todaysDate; }
 	std::pair<Real, Real> GetNominal() const { return m_nominal; }

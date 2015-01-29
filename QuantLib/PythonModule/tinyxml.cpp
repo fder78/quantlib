@@ -978,7 +978,7 @@ bool TiXmlDocument::LoadFile( const char* _filename, TiXmlEncoding encoding )
 	}
 	else
 	{
-		SetError( TIXML_ERROR_OPENING_FILE, 0, 0, TIXML_ENCODING_UNKNOWN );
+		SetError( TIXML_ERROR_FOPEN_FAIL, 0, 0, TIXML_ENCODING_UNKNOWN );
 		return false;
 	}
 }
@@ -987,7 +987,7 @@ bool TiXmlDocument::LoadFile( FILE* file, TiXmlEncoding encoding )
 {
 	if ( !file ) 
 	{
-		SetError( TIXML_ERROR_OPENING_FILE, 0, 0, TIXML_ENCODING_UNKNOWN );
+		SetError( TIXML_ERROR_NULL_FILE_POINTER, 0, 0, TIXML_ENCODING_UNKNOWN );
 		return false;
 	}
 
@@ -1034,7 +1034,7 @@ bool TiXmlDocument::LoadFile( FILE* file, TiXmlEncoding encoding )
 
 	if ( fread( buf, length, 1, file ) != 1 ) {
 		delete [] buf;
-		SetError( TIXML_ERROR_OPENING_FILE, 0, 0, TIXML_ENCODING_UNKNOWN );
+		SetError( TIXML_ERROR_FREAD_FAIL, 0, 0, TIXML_ENCODING_UNKNOWN );
 		return false;
 	}
 

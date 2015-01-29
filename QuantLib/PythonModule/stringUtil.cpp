@@ -1,4 +1,6 @@
-#include <stringUtil.h>
+#include "StdAfx.h"
+
+#include "StringUtil.h"
 
 bool CompareString( std::wstring lhs, std::wstring rhs )
 {

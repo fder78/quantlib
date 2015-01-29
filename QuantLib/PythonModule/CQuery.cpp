@@ -18,7 +18,7 @@
 CQuery 클래스:ODBC의 래퍼 클래스. API 수준에서 재사용 가능하도록 작성하였다.
 SQL문을 편리하게 실행하고 결과를 쉽게 읽는데 초점을 맞추었으며 SQL 서버와 
 액세스에서 완벽하게 테스트되었다.
-512자 이하의 정수, 문자열 컬럼에 대해서만 사용 가능하며 그 이상의 길이를 가
+255자 이하의 정수, 문자열 컬럼에 대해서만 사용 가능하며 그 이상의 길이를 가
 지는 필드는 "오른쪽 잘림" 진단 경고가 발생하므로 이 클래스로 읽을 수 없으며
 ODBC API 함수를 직접 사용해야 한다.
 최대 컬럼 개수는 100개이다. 초과시 사정없이 에러 메시지 박스를 출력하므로 이 
@@ -117,7 +117,6 @@ BOOL CQuery::Connect(int Type, const char *ConStr, const char *UID, const char *
 	if ((ret != SQL_SUCCESS) && (ret != SQL_SUCCESS_WITH_INFO)) {
 		while (Ret=SQLGetDiagRec(SQL_HANDLE_DBC, hDbc, ii, SqlState, &NativeError, 
 			Msg, sizeof(Msg), &MsgLen)!=SQL_NO_DATA) {
-			QL_ASSERT( false, "DB연결실패" );
 			wsprintf(str, TEXT("SQLSTATE:%s, 진단정보:%s"),SqlState,Msg);
 			::MessageBox(NULL,str,TEXT("진단 정보"),0);
 			ii++;
@@ -173,7 +172,7 @@ BOOL CQuery::Exec( const std::wstring& query )
 	// 모든 컬럼을 문자열로 바인딩해 놓는다. Col배열은 zero base, 
 	// 컬럼 번호는 one base임에 유의할 것
 	for (c=0;c<nCol;c++) {
-		SQLBindCol(hStmt,c+1,SQL_C_CHAR,Col[c],512,&lCol[c]);
+		SQLBindCol(hStmt,c+1,SQL_C_CHAR,Col[c],255,&lCol[c]);
 		SQLDescribeCol(hStmt,c+1,ColNameW[c],30,NULL,NULL,NULL,NULL,NULL);
 	}
 	return TRUE;
@@ -298,8 +297,6 @@ std::wstring CQuery::GetStr( const std::wstring& sCol ) const
 // 에러 발생시 진단 정보를 출력해 준다.
 void CQuery::PrintDiag()
 {
-	QL_ASSERT( false, "DB연결실패" );
-
 	int ii;
 	SQLRETURN Ret;
 	SQLINTEGER NativeError;
@@ -332,13 +329,13 @@ void CQuery::PrintDiag()
 // BLOB 데이터를 buf에 채워준다. 이때 buf는 충분한 크기의 메모리를 미리 할당해 
 // 놓아야 한다. NULL일 경우 0을 리턴하고 에러 발생시 -1을 리턴한다. 성공시 읽은 
 // 총 바이트 수를 리턴한다. szSQL은 하나의 BLOB 필드를 읽는 Select SQL문이어야 한다.
-SQLLEN CQuery::ReadBlob(LPCTSTR szSQL, void *buf)
+int CQuery::ReadBlob(LPCTSTR szSQL, void *buf)
 {
 	SQLCHAR BinaryPtr[BLOBBATCH];
-	SQLLEN LenBin;
+	SQLINTEGER LenBin;
 	char *p;
-	SQLLEN nGet;
-	SQLLEN TotalGet=0;
+	int nGet;
+	int TotalGet=0;
 
 	SQLWCHAR szSQLW[8192];
 	char_to_wchar(szSQLW, (char*)szSQL);
@@ -372,9 +369,9 @@ SQLLEN CQuery::ReadBlob(LPCTSTR szSQL, void *buf)
 
 // buf의 BLOB 데이터를 저장한다. szSQL은 하나의 BLOB 데이터를 저장하는 Update, Insert
 // SQL문이어야 한다.
-void CQuery::WriteBlob(LPCTSTR szSQL, void *buf, SQLLEN size)
+void CQuery::WriteBlob(LPCTSTR szSQL, void *buf, int size)
 {
-	SQLLEN cbBlob;
+	SQLINTEGER cbBlob;
 	char tmp[BLOBBATCH],*p;
 	SQLPOINTER pToken;
 	int nPut;
@@ -400,9 +397,4 @@ void CQuery::WriteBlob(LPCTSTR szSQL, void *buf, SQLLEN size)
 		ret=SQLParamData(hStmt, &pToken);
 	}
 	Clear();
-}
-
-SQLLEN CQuery::GetNumRow() const
-{
-	return nRow;
 }

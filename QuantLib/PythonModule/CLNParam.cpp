@@ -12,12 +12,14 @@
 #include "CurveTable.h"
 #include "PricingSetting.h"
 
-#include "yield_builder.hpp"
-//#include "../../Daishin_Credit_Derivatives/cln_NtD.hpp"
-//#include "../../Daishin_Credit_Derivatives/cln_singlename.hpp"
-//#include "../../Daishin_Credit_Derivatives/credit_result.hpp"
+#include "InterestRateCurveInfoWrapper.h"
 
-void CLNParam::SetDataImpl( const TiXmlElement* record )
+#include "yield_builder.hpp"
+#include "../../Daishin_Credit_Derivatives/cln_NtD.hpp"
+#include "../../Daishin_Credit_Derivatives/cln_singlename.hpp"
+#include "../../Daishin_Credit_Derivatives/credit_result.hpp"
+
+void CLNParam::SetDataImpl( TiXmlElement* record )
 {
 	m_book = XMLValue( record, PI_Book ).GetValue<const char*>();
 	m_todaysDate = PricingSetting::instance().GetEvaluationDate();
@@ -60,14 +62,14 @@ void CLNParam::SetDataImpl( const TiXmlElement* record )
 	m_nextToLastDate = XMLValue( record, PI_NextToLastdate );
 
 	// Market Info
-	m_tsCurve_rf = Handle<YieldTermStructure>( ::build_yield_curve( *CurveTable::instance().GetYieldCurve( XMLValue( record, PI_RfRateCurve ) )->GetCurveData() ) );
-	m_tsCurve_disc = Handle<YieldTermStructure>( ::build_yield_curve( *CurveTable::instance().GetYieldCurve( XMLValue( record, PI_DiscountRateCurve ) )->GetCurveData() ) );
+	m_tsCurve_rf = Handle<YieldTermStructure>( ::build_yield_curve( *boost::dynamic_pointer_cast<InterestRateCurveInfoWrapper>( CurveTable::instance().GetYieldCurve( XMLValue( record, PI_RfRateCurve ), ShiftOption::ShiftNothing ) )->GetCurveData() ) );
+	m_tsCurve_disc = Handle<YieldTermStructure>( ::build_yield_curve( *boost::dynamic_pointer_cast<InterestRateCurveInfoWrapper>( CurveTable::instance().GetYieldCurve( XMLValue( record, PI_DiscountRateCurve ), ShiftOption::ShiftNothing ) )->GetCurveData() ) );
 
-	boost::shared_ptr<FXCurveData> fxCurve = CurveTable::instance().GetFXCurve( XMLValue( record, PI_FXFwdCurve ) );
+	boost::shared_ptr<FXCurveData> fxCurve = CurveTable::instance().GetFXCurve( XMLValue( record, PI_FXFwdCurve ), ShiftOption::ShiftNothing );
 	m_fxVol = XMLValue( record, PI_FXVol );
 
-	m_date_fxFwd = fxCurve->m_fwdDate;
-	m_value_fxFwd = fxCurve->m_fwdValue;
+	m_date_fxFwd = fxCurve->fwdDate;
+	m_value_fxFwd = fxCurve->fwdValue;
 
 	// Product Info
 	std::pair<Real, Real> corrRcvry = CurveTable::instance().GetCorrRcvy( ::ToWString( GetProductName() ) );
@@ -87,8 +89,8 @@ void CLNParam::SetDataImpl( const TiXmlElement* record )
 
 		boost::shared_ptr<CDSCurveData> cdsPremium = CurveTable::instance().GetCDSCurve( trimmed );
 
-		m_tenors.push_back( cdsPremium->m_tenors );
-		m_quoted_spreads.push_back( cdsPremium->m_quoted_spreads );
+		m_tenors.push_back( cdsPremium->tenors );
+		m_quoted_spreads.push_back( cdsPremium->quotedSpreads );
 	}
 }
 
@@ -99,7 +101,7 @@ void CLNParam::Calculate()
 	{
 		TiXmlElement resNode( "price" );
 
-		resNode.SetDoubleAttribute( "value", res.price );
+		resNode.SetAttribute( "value", ::ToString( res.price ) );
 		resNode.SetAttribute( "type", "double" );
 
 		GetResultObject()->InsertEndChild( resNode );
@@ -109,7 +111,7 @@ void CLNParam::Calculate()
 	{
 		TiXmlElement notional2( "notional2" );
 
-		notional2.SetDoubleAttribute( "value", m_nominal.first );
+		notional2.SetAttribute( "value", ::ToString( m_nominal.first ) );
 		notional2.SetAttribute( "type", "double" );
 
 		GetResultObject()->InsertEndChild( notional2 );
@@ -118,7 +120,7 @@ void CLNParam::Calculate()
 	{
 		TiXmlElement notional1( "notional1" );
 
-		notional1.SetDoubleAttribute( "value", m_nominal.second );
+		notional1.SetAttribute( "value", ::ToString( m_nominal.second ) );
 		notional1.SetAttribute( "type", "double" );
 
 		GetResultObject()->InsertEndChild( notional1 );
@@ -197,7 +199,7 @@ QuantLib::CLNPricingResult CLNParam::CalcRes()
 	case 1:
 		res = cln_singlename( m_todaysDate, m_nominal, m_cpnRate, m_dayCounter, m_tsCurve_rf, m_tsCurve_disc, m_date_fxFwd, m_value_fxFwd, m_fxVol, m_recoveryRate, m_tenors.front(), m_quoted_spreads.front(), m_effectiveDate, m_terminationDate, m_tenor, m_calendar, m_convention, m_terminationDateConvention, m_rule, m_endOfMonth, m_firstDate, m_nextToLastDate );
 	default:
-		res = cln_NtD( m_todaysDate, m_quoted_spreads.size(), m_nominal, m_cpnRate, m_dayCounter, m_tsCurve_rf, m_tsCurve_disc, m_date_fxFwd, m_value_fxFwd, m_fxVol, m_recoveryRate, m_correlation, m_tenors, m_quoted_spreads, m_effectiveDate, m_terminationDate, m_tenor, m_calendar, m_convention, m_terminationDateConvention, m_rule, m_endOfMonth, m_firstDate, m_nextToLastDate );
+		res = cln_NtD( m_todaysDate, 1, m_nominal, m_cpnRate, m_dayCounter, m_tsCurve_rf, m_tsCurve_disc, m_date_fxFwd, m_value_fxFwd, m_fxVol, m_recoveryRate, m_correlation, m_tenors, m_quoted_spreads, m_effectiveDate, m_terminationDate, m_tenor, m_calendar, m_convention, m_terminationDateConvention, m_rule, m_endOfMonth, m_firstDate, m_nextToLastDate );
 		break;
 	}
 	res.price *= -1;

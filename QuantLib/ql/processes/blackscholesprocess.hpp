@@ -58,8 +58,9 @@ namespace QuantLib {
         Real x0() const;
         /*! \todo revise extrapolation */
         Real drift(Time t, Real x) const;
-        /*! \todo revise extrapolation */
-        Real diffusion(Time t, Real x) const;
+		virtual Real drift(Time t, Real x, Time dt) const;
+		/*! \todo revise extrapolation */
+		Real diffusion(Time t, Real x) const;
         Real apply(Real x0, Real dx) const;
         /*! \warning raises a "not implemented" exception.  It should
                      be rewritten to return the expectation E(S) of
@@ -81,7 +82,7 @@ namespace QuantLib {
         const Handle<BlackVolTermStructure>& blackVolatility() const;
         const Handle<LocalVolTermStructure>& localVolatility() const;
         //@}
-      private:
+      protected:
         Handle<Quote> x0_;
         Handle<YieldTermStructure> riskFreeRate_, dividendYield_;
         Handle<BlackVolTermStructure> blackVolatility_;
@@ -117,15 +118,15 @@ namespace QuantLib {
 
         \ingroup processes
     */
-    class BlackScholesMertonProcess : public GeneralizedBlackScholesProcess {
-      public:
-        BlackScholesMertonProcess(
-            const Handle<Quote>& x0,
-            const Handle<YieldTermStructure>& dividendTS,
-            const Handle<YieldTermStructure>& riskFreeTS,
-            const Handle<BlackVolTermStructure>& blackVolTS,
-            const boost::shared_ptr<discretization>& d =
-                  boost::shared_ptr<discretization>(new EulerDiscretization));
+	class BlackScholesMertonProcess : public GeneralizedBlackScholesProcess {
+	public:
+		BlackScholesMertonProcess(
+			const Handle<Quote>& x0,
+			const Handle<YieldTermStructure>& dividendTS,
+			const Handle<YieldTermStructure>& riskFreeTS,
+			const Handle<BlackVolTermStructure>& blackVolTS,
+			const boost::shared_ptr<discretization>& d =
+			boost::shared_ptr<discretization>(new EulerDiscretization));
     };
 
     //! Black (1976) stochastic process
@@ -167,6 +168,28 @@ namespace QuantLib {
             const boost::shared_ptr<discretization>& d =
                   boost::shared_ptr<discretization>(new EulerDiscretization));
     };
+
+	/*Added by K.H.Hwang*/
+	/*2012.5.31*/
+	class BSM_QuantoAdjusted_Process : public GeneralizedBlackScholesProcess {
+	public:
+		BSM_QuantoAdjusted_Process(
+			const Handle<Quote>& x0,
+			const Handle<YieldTermStructure>& dividendTS,
+			const Handle<YieldTermStructure>& riskFreeTS,
+			const Handle<BlackVolTermStructure>& blackVolTS,
+			const Real fxVol,
+			const Real fxCorr,
+			const boost::shared_ptr<discretization>& d =
+			boost::shared_ptr<discretization>(new EulerDiscretization));
+		virtual Real drift(Time t, Real x, Time dt) const;
+		virtual Real expectation(Time t, Real x, Time dt) const;
+		//virtual Real stdDeviation(Time t, Real x, Time dt) const;
+	private:
+		Real fxVol_;
+		Real fxCorr_;
+		Real logExpectation(Time t, Real x, Time dt) const;
+	};
 
 }
 

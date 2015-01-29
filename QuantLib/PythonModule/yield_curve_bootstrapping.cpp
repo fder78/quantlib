@@ -1,6 +1,5 @@
 #include "StdAfx.h"
 #include "yield_curve_bootstrapping.hpp"
-#include "xccyratehelper.hpp"
 #include <iostream>
 
 
@@ -11,8 +10,7 @@ namespace QuantLib {
 		std::vector<FutRateData> futures,
 		std::vector<FraRateData> fras,
 		std::vector<SwapRateData> swaps,
-		std::vector<BondRateData> bonds,
-		std::vector<XCCySwapRateData> xccys
+		std::vector<BondRateData> bonds
 		) {
 
 		Settings::instance().evaluationDate() = evaluationDate;
@@ -68,32 +66,6 @@ namespace QuantLib {
 			depoFRASwapBondInstruments.push_back(swapInst);
 		}
 
-		for (Size i=0; i<xccys.size(); ++i) {
-			boost::shared_ptr<RateHelper> xccyInst(
-				new XCCySwapRateHelper(
-				  Handle<Quote>( new SimpleQuote( xccys[ i ].spread ) )
-				, xccys[ i ].tenor
-				, xccys[ i ].fxSpot
-				, xccys[ i ].floatLegCurrency
-				, xccys[ i ].floatLegCalendar
-				, xccys[ i ].floatLegConvention
-				, xccys[ i ].floatLegDayCounter
-				, xccys[ i ].floatLegIborIndex
-
-				//fixed leg
-				, xccys[ i ].fixedLegCurrency
-				, xccys[ i ].fixedLegCalendar
-				, xccys[ i ].fixedLegConvention
-				, xccys[ i ].fixedLegDayCounter
-				, xccys[ i ].fixedLegIborIndex
-
-				//term structures
-				, xccys[ i ].floatLegDiscTermStructureHandle
-				, xccys[ i ].fixedLegDiscTermStructureHandle
-			) );
-			depoFRASwapBondInstruments.push_back(xccyInst);
-		}
-
 		for (Size i=0; i<bonds.size(); ++i) {
 			Schedule schedule(bonds[i].issueDate, bonds[i].maturity, Period( bonds[i].cpnFreq ), bonds[i].calendar,
 				Unadjusted, Unadjusted, DateGeneration::Backward, false);
@@ -107,7 +79,7 @@ namespace QuantLib {
 				Unadjusted,
 				100.,
 				bonds[i].issueDate));
-			depoFRASwapBondInstruments.push_back(bondHelper);
+				depoFRASwapBondInstruments.push_back(bondHelper);
 		}
 
 		DayCounter termStructureDayCounter = Actual365Fixed();
@@ -133,4 +105,5 @@ namespace QuantLib {
 		return yieldCurve;
 
 	}
+
 }

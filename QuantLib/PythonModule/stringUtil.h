@@ -1,18 +1,6 @@
 #pragma once
 
-#include <windows.h>
-#include <ql/quantlib.hpp>
 #include <boost/format.hpp>
-#include <boost/scoped_array.hpp>
-
-using namespace QuantLib;
-
-namespace QuantLib {
-	// HC Added
-	typedef Integer Hour;
-	typedef Integer Minute;
-	typedef Integer Second;
-}
 
 // case insensitive한 비교를 위해 transform을 하기 때문에 참조자로 받지 않는다.
 bool CompareString( std::wstring lhs, std::wstring rhs );
@@ -48,34 +36,6 @@ inline std::wstring ToWString( double val )
 	return buf.str();
 }
 
-inline std::wstring ToWString( int val )
-{
-	std::wostringstream buf;
-	buf << boost::wformat( L"%d" ) % val;
-	return buf.str();
-}
-
-inline std::wstring ToWString( unsigned int val )
-{
-	std::wostringstream buf;
-	buf << boost::wformat( L"%u" ) % val;
-	return buf.str();
-}
-
-#ifdef _WIN64
-inline std::wstring ToWString( size_t val )
-{
-	std::wostringstream buf;
-	buf << boost::wformat( L"%u" ) % val;
-	return buf.str();
-}
-#endif
-
-inline std::wstring TowString( bool val )
-{
-	return ( val ) ? L"1" : L"0";
-}
-
 inline std::wstring ToWString( const std::wstring& str )
 {
 	return str;
@@ -91,10 +51,6 @@ inline std::wstring ToWString( const Date& date )
 template<typename T>
 inline std::wstring ToWString( const std::vector<T>& v )
 {
-	if( v.empty() )
-	{
-		return std::wstring();
-	}
 	std::wostringstream buf;
 	buf << ::ToWString( v.front() );
 	for( size_t i = 1; i < v.size(); i++ )
@@ -125,6 +81,114 @@ inline std::string ToString( double val )
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 
+inline Date ConvertToDate( const std::wstring& str )
+{
+	std::vector<std::wstring> dt;
+	boost::algorithm::split( dt, str, boost::is_any_of( L" " ), boost::algorithm::token_compress_on );
+	std::vector<std::wstring> ymd;
+	boost::algorithm::split( ymd, dt[ 0 ], boost::is_any_of( L"-" ), boost::algorithm::token_compress_on );
+
+	QL_ASSERT( ymd.size() == 3, ::ToString( str ) + "날짜가 이상합니다" );
+
+	BigInteger y = boost::lexical_cast<BigInteger>( ymd[ 0 ] );
+	BigInteger m = boost::lexical_cast<BigInteger>( ymd[ 1 ] );
+	BigInteger d = boost::lexical_cast<BigInteger>( ymd[ 2 ] );
+
+	return Date( Day( d ), Month( m ), Year( y ) );
+}
+
+inline Date ConvertToDate( const std::string& str )
+{
+	return ConvertToDate( ::ToWString( str ) );
+}
+
+
+template<typename strType, typename Pred>
+inline std::vector<strType> Split( const strType& str, const Pred& pred )
+{
+	std::vector<strType> splitted;
+	boost::algorithm::split( splitted, str, pred, boost::algorithm::token_compress_on );
+
+	return splitted;
+}
+
+template<typename strType, typename Pred>
+inline std::vector<Real> SplitStrToRealVector( const strType& str, const Pred& pred )
+{
+	std::vector<std::wstring> splitted;
+	boost::algorithm::split( splitted, str, pred, boost::algorithm::token_compress_on );
+
+	std::vector<Real> res;
+	res.reserve( splitted.size() );
+
+	for each( const strType& v in splitted )
+	{
+		res.push_back( boost::lexical_cast<Real>( v ) );
+	}
+
+	return res;
+}
+
+
+inline Date ConvertToDateFromBloomberg( const std::wstring& str )
+{
+	std::vector<std::wstring> mdy;
+	boost::algorithm::split( mdy, str, boost::is_any_of( L"/" ), boost::algorithm::token_compress_on );
+
+	QL_ASSERT( mdy.size() == 3, ::ToString( str ) + "날짜가 이상합니다" );
+
+	BigInteger y = boost::lexical_cast<BigInteger>( mdy[ 2 ] );
+	BigInteger m = boost::lexical_cast<BigInteger>( mdy[ 0 ] );
+	BigInteger d = boost::lexical_cast<BigInteger>( mdy[ 1 ] );
+
+	return Date( Day( d ), Month( m ), Year( y ) );
+}
+
+inline std::string ConvertToBloombergDate( const Date& date )
+{
+	std::ostringstream buf;
+	buf << boost::format( "%d/%d/%d" ) % static_cast<int>( date.month() ) % static_cast<int>( date.dayOfMonth() ) % static_cast<int>( date.year() );
+	return buf.str();
+}
+
+inline std::wstring ConvertToCurrencyCode( const std::wstring& code )
+{
+	if( code == L"U180" )
+	{
+		return L"KRW";
+	}
+	else if( code == L"SPX" )
+	{
+		return L"USD";
+	}
+	else if( code == L"HSCEI" )
+	{
+		return L"HKD";
+	}
+	else if( code == L"SX5E" )
+	{
+		return L"EUR";
+	}
+	else if( code == L"TWSE" )
+	{
+		return L"TWD";
+	}
+
+	return L"KRW";
+}
+
+
+
+inline std::wstring ToWStringWTime( const Date& date )
+{
+	std::wostringstream buf;
+	BigInteger hour = date.second() / 3600;
+	BigInteger minute = date.second() / 60 % 60;
+	BigInteger second = date.second() % 60;
+	buf << boost::wformat( L"%04d-%02d-%02d %02d:%02d:%02d" ) % date.year() % date.month() % date.dayOfMonth() % hour % minute % second;
+	return buf.str();
+}
+
 inline Date ConvertToDateWTime( const std::wstring& str )
 {
 	std::vector<std::wstring> dt;
@@ -151,97 +215,28 @@ inline Date ConvertToDateWTime( const std::wstring& str )
 		y++;
 	}
 
-	return Date( Day( d ), Month( m ), Year( y ) ); //, Hour( h ), Minute( mi ), Second( s ) );
+	return Date( Day( d ), Month( m ), Year( y ), Hour( h ), Minute( mi ), Second( s ) );
 }
 
-inline Date ConvertToDate( const std::wstring& str )
-{
-	std::vector<std::wstring> dt;
-	boost::algorithm::split( dt, str, boost::is_any_of( L" " ), boost::algorithm::token_compress_on );
-	if( dt.size() == 2 )
-	{
-		return ConvertToDateWTime( str );
-	}
-
-	std::vector<std::wstring> ymd;
-	boost::algorithm::split( ymd, dt[ 0 ], boost::is_any_of( L"-" ), boost::algorithm::token_compress_on );
-
-	QL_ASSERT( ymd.size() == 3, ::ToString( str ) + "날짜가 이상합니다" );
-
-	BigInteger y = boost::lexical_cast<BigInteger>( ymd[ 0 ] );
-	BigInteger m = boost::lexical_cast<BigInteger>( ymd[ 1 ] );
-	BigInteger d = boost::lexical_cast<BigInteger>( ymd[ 2 ] );
-
-	if( y == 1900 )
-	{
-		y++;
-	}
-
-	return Date( Day( d ), Month( m ), Year( y ) );
-}
-
-inline std::wstring ToWStringWTime( const Date& date )
+inline std::wstring ToWString( int val )
 {
 	std::wostringstream buf;
-	//BigInteger hour = date.second() / 3600;
-	//BigInteger minute = date.second() / 60 % 60;
-	//BigInteger second = date.second() % 60;
-	BigInteger hour = 0;
-	BigInteger minute = 0;
-	BigInteger second = 0;
-	buf << boost::wformat( L"%04d-%02d-%02d %02d:%02d:%02d" ) % date.year() % date.month() % date.dayOfMonth() % hour % minute % second;
+	buf << boost::wformat( L"%d" ) % val;
 	return buf.str();
 }
 
-template<typename strType, typename Pred>
-inline std::vector<strType> Split( const strType& str, const Pred& pred )
+inline std::wstring ToWString( unsigned int val )
 {
-	std::vector<strType> splitted;
-	boost::algorithm::split( splitted, str, pred, boost::algorithm::token_compress_on );
-
-	return splitted;
+	std::wostringstream buf;
+	buf << boost::wformat( L"%u" ) % val;
+	return buf.str();
 }
 
-inline Date ConvertToDateFromBloomberg( const std::wstring& str )
+#ifdef _WIN64
+inline std::wstring ToWString( size_t val )
 {
-	std::vector<std::wstring> mdy;
-	boost::algorithm::split( mdy, str, boost::is_any_of( L"/" ), boost::algorithm::token_compress_on );
-
-	QL_ASSERT( mdy.size() == 3, ::ToString( str ) + "날짜가 이상합니다" );
-
-	BigInteger y = boost::lexical_cast<BigInteger>( mdy[ 2 ] );
-	BigInteger m = boost::lexical_cast<BigInteger>( mdy[ 0 ] );
-	BigInteger d = boost::lexical_cast<BigInteger>( mdy[ 1 ] );
-
-	return Date( Day( d ), Month( m ), Year( y ) );
+	std::wostringstream buf;
+	buf << boost::wformat( L"%u" ) % val;
+	return buf.str();
 }
-
-inline std::wstring ConvertToCurrencyCode( const std::wstring& code )
-{
-	if( code == L"U180" )
-	{
-		return L"KRW";
-	}
-	else if( code == L"SPX" )
-	{
-		return L"USD";
-	}
-	else if( code == L"HSCEI" )
-	{
-		return L"HKD";
-	}
-	else if( code == L"SX5E" )
-	{
-		return L"EUR";
-	}
-	else if( code == L"TWSE" )
-	{
-		return L"TWD";
-	}
-	else if( code == L"NKY Index" )
-	{
-		return L"NKY";
-	}
-
-	return L"KRW";
-}
+#endif

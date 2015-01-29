@@ -9,6 +9,7 @@ namespace QuantLib {
 	struct YieldCurveData {
 		std::vector<Date> dates;
 		std::vector<Rate> yields;
+		std::vector<Size> chunkIndex;
 		DayCounter dc;
 	};
 	
@@ -16,9 +17,7 @@ namespace QuantLib {
 		const Rate& forward,
 		const DayCounter& dc);
 
-
 	boost::shared_ptr<YieldTermStructure> build_yield_curve(const YieldCurveData& data);
-
 }
 
 #endif

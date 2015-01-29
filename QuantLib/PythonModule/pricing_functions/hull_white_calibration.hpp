@@ -1,4 +1,3 @@
-
 #pragma once
 
 #include <ql/termstructures/yieldtermstructure.hpp>
@@ -8,7 +7,7 @@
 #include <ql/models/shortrate/onefactormodels/generalized_hullwhite.hpp>
 
 namespace QuantLib {
-
+	
 	struct HullWhiteTimeDependentParameters {
 		Real a;
 		std::vector<Date> tenor;
@@ -44,14 +43,15 @@ namespace QuantLib {
 	};
 
 	HullWhiteTimeDependentParameters calibration_hull_white
-		(
+	(
 		const Date& evalDate,
 		const CapVolData& volData
-		);
+	);
 
 	HullWhiteTimeDependentParameters calibration_hull_white(
 		const Date& evalDate,
 		const SwaptionVolData& volData
-		);
+	);
 
 }
+

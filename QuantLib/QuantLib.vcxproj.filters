@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="methods">
@@ -324,6 +324,9 @@
     </Filter>
     <Filter Include="methods\finitedifferences\utilities">
       <UniqueIdentifier>{be723df5-2e58-41de-8071-8d2e2f62410a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ds_interestrate_derivatives">
+      <UniqueIdentifier>{2328f1dc-0e84-4eac-84a2-1bebdc518ea8}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -3903,6 +3906,99 @@
     <ClInclude Include="ql\pricingengines\vanilla\analytich1hwengine.hpp">
       <Filter>pricingengines\vanilla</Filter>
     </ClInclude>
+    <ClInclude Include="ql\indexes\ibor\HIBOR3M.hpp">
+      <Filter>indexes\ibor</Filter>
+    </ClInclude>
+    <ClInclude Include="ql\indexes\ibor\cd91.hpp">
+      <Filter>indexes\ibor</Filter>
+    </ClInclude>
+    <ClInclude Include="ds_interestrate_derivatives\cashflows\range_accrual_coupon.hpp">
+      <Filter>ds_interestrate_derivatives</Filter>
+    </ClInclude>
+    <ClInclude Include="ds_interestrate_derivatives\cashflows\spread_coupon.hpp">
+      <Filter>ds_interestrate_derivatives</Filter>
+    </ClInclude>
+    <ClInclude Include="ds_interestrate_derivatives\index\index_calculator.hpp">
+      <Filter>ds_interestrate_derivatives</Filter>
+    </ClInclude>
+    <ClInclude Include="ds_interestrate_derivatives\index\spread_index.hpp">
+      <Filter>ds_interestrate_derivatives</Filter>
+    </ClInclude>
+    <ClInclude Include="ds_interestrate_derivatives\instruments\callability.hpp">
+      <Filter>ds_interestrate_derivatives</Filter>
+    </ClInclude>
+    <ClInclude Include="ds_interestrate_derivatives\instruments\notes\callable_cpn_bond.hpp">
+      <Filter>ds_interestrate_derivatives</Filter>
+    </ClInclude>
+    <ClInclude Include="ds_interestrate_derivatives\instruments\notes\fixedrate_cpn_bond.hpp">
+      <Filter>ds_interestrate_derivatives</Filter>
+    </ClInclude>
+    <ClInclude Include="ds_interestrate_derivatives\instruments\notes\power_spread_note.hpp">
+      <Filter>ds_interestrate_derivatives</Filter>
+    </ClInclude>
+    <ClInclude Include="ds_interestrate_derivatives\instruments\notes\range_accrual_note.hpp">
+      <Filter>ds_interestrate_derivatives</Filter>
+    </ClInclude>
+    <ClInclude Include="ds_interestrate_derivatives\instruments\swaps\cross_ccy_swap.hpp">
+      <Filter>ds_interestrate_derivatives</Filter>
+    </ClInclude>
+    <ClInclude Include="ds_interestrate_derivatives\instruments\swaps\power_spread_swap.hpp">
+      <Filter>ds_interestrate_derivatives</Filter>
+    </ClInclude>
+    <ClInclude Include="ds_interestrate_derivatives\instruments\swaps\range_accrual_swap.hpp">
+      <Filter>ds_interestrate_derivatives</Filter>
+    </ClInclude>
+    <ClInclude Include="ds_interestrate_derivatives\pricingengine\fdm_engine\fdm_ghw_op.hpp">
+      <Filter>ds_interestrate_derivatives</Filter>
+    </ClInclude>
+    <ClInclude Include="ds_interestrate_derivatives\pricingengine\fdm_engine\fdm_ghw_solver.hpp">
+      <Filter>ds_interestrate_derivatives</Filter>
+    </ClInclude>
+    <ClInclude Include="ds_interestrate_derivatives\pricingengine\fdm_engine\fdm_ra_engine_ghw.hpp">
+      <Filter>ds_interestrate_derivatives</Filter>
+    </ClInclude>
+    <ClInclude Include="ds_interestrate_derivatives\pricingengine\fdm_engine\fdm_ra_stepcondition_ghw.hpp">
+      <Filter>ds_interestrate_derivatives</Filter>
+    </ClInclude>
+    <ClInclude Include="ds_interestrate_derivatives\pricingengine\mc_ir_early_exercise_path_pricer.hpp">
+      <Filter>ds_interestrate_derivatives</Filter>
+    </ClInclude>
+    <ClInclude Include="ds_interestrate_derivatives\pricingengine\mc_ir_lsmc_pathpricer.hpp">
+      <Filter>ds_interestrate_derivatives</Filter>
+    </ClInclude>
+    <ClInclude Include="ds_interestrate_derivatives\pricingengine\mc_lsmc_engine.hpp">
+      <Filter>ds_interestrate_derivatives</Filter>
+    </ClInclude>
+    <ClInclude Include="ds_interestrate_derivatives\pricingengine\mc_lsmc_pathpricer.hpp">
+      <Filter>ds_interestrate_derivatives</Filter>
+    </ClInclude>
+    <ClInclude Include="ds_interestrate_derivatives\pricingengine\mc_powerspread_note_lsmc_engine.hpp">
+      <Filter>ds_interestrate_derivatives</Filter>
+    </ClInclude>
+    <ClInclude Include="ds_interestrate_derivatives\pricingengine\mc_powerspread_swap_lsmc_engine.hpp">
+      <Filter>ds_interestrate_derivatives</Filter>
+    </ClInclude>
+    <ClInclude Include="ds_interestrate_derivatives\pricingengine\mc_rangeaccrual_note_lsmc_engine.hpp">
+      <Filter>ds_interestrate_derivatives</Filter>
+    </ClInclude>
+    <ClInclude Include="ds_interestrate_derivatives\pricingengine\mc_rangeaccrual_swap_lsmc_engine.hpp">
+      <Filter>ds_interestrate_derivatives</Filter>
+    </ClInclude>
+    <ClInclude Include="ds_interestrate_derivatives\pricingengine\tree_engine\discretized_callable_bond.hpp">
+      <Filter>ds_interestrate_derivatives</Filter>
+    </ClInclude>
+    <ClInclude Include="ds_interestrate_derivatives\pricingengine\tree_engine\tree_callable_bond_engine.hpp">
+      <Filter>ds_interestrate_derivatives</Filter>
+    </ClInclude>
+    <ClInclude Include="ds_interestrate_derivatives\termstructure\fx_term_structure.hpp">
+      <Filter>ds_interestrate_derivatives</Filter>
+    </ClInclude>
+    <ClInclude Include="ds_interestrate_derivatives\model\generalized_hullwhite.hpp">
+      <Filter>ds_interestrate_derivatives</Filter>
+    </ClInclude>
+    <ClInclude Include="ql\experimental\finitedifferences\fdmhullwhitemesher.hpp">
+      <Filter>experimental\finitedifferences</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ql\methods\montecarlo\brownianbridge.cpp">
@@ -6243,7 +6339,6 @@
     <ClCompile Include="ql\experimental\finitedifferences\glued1dmesher.cpp">
       <Filter>experimental\finitedifferences</Filter>
     </ClCompile>
-
     <ClCompile Include="ql\experimental\finitedifferences\fdmblackscholesfwdop.cpp">
       <Filter>experimental\finitedifferences</Filter>
     </ClCompile>
@@ -6270,6 +6365,72 @@
     </ClCompile>
     <ClCompile Include="ql\pricingengines\vanilla\analytich1hwengine.cpp">
       <Filter>pricingengines\vanilla</Filter>
+    </ClCompile>
+    <ClCompile Include="ds_interestrate_derivatives\cashflows\range_accrual_coupon.cpp">
+      <Filter>ds_interestrate_derivatives</Filter>
+    </ClCompile>
+    <ClCompile Include="ds_interestrate_derivatives\cashflows\spread_coupon.cpp">
+      <Filter>ds_interestrate_derivatives</Filter>
+    </ClCompile>
+    <ClCompile Include="ds_interestrate_derivatives\index\index_calculator.cpp">
+      <Filter>ds_interestrate_derivatives</Filter>
+    </ClCompile>
+    <ClCompile Include="ds_interestrate_derivatives\instruments\notes\callable_cpn_bond.cpp">
+      <Filter>ds_interestrate_derivatives</Filter>
+    </ClCompile>
+    <ClCompile Include="ds_interestrate_derivatives\instruments\notes\fixedrate_cpn_bond.cpp">
+      <Filter>ds_interestrate_derivatives</Filter>
+    </ClCompile>
+    <ClCompile Include="ds_interestrate_derivatives\instruments\notes\power_spread_note.cpp">
+      <Filter>ds_interestrate_derivatives</Filter>
+    </ClCompile>
+    <ClCompile Include="ds_interestrate_derivatives\instruments\notes\range_accrual_note.cpp">
+      <Filter>ds_interestrate_derivatives</Filter>
+    </ClCompile>
+    <ClCompile Include="ds_interestrate_derivatives\instruments\swaps\cross_ccy_swap.cpp">
+      <Filter>ds_interestrate_derivatives</Filter>
+    </ClCompile>
+    <ClCompile Include="ds_interestrate_derivatives\instruments\swaps\power_spread_swap.cpp">
+      <Filter>ds_interestrate_derivatives</Filter>
+    </ClCompile>
+    <ClCompile Include="ds_interestrate_derivatives\instruments\swaps\range_accrual_swap.cpp">
+      <Filter>ds_interestrate_derivatives</Filter>
+    </ClCompile>
+    <ClCompile Include="ds_interestrate_derivatives\pricingengine\fdm_engine\fdm_ghw_op.cpp">
+      <Filter>ds_interestrate_derivatives</Filter>
+    </ClCompile>
+    <ClCompile Include="ds_interestrate_derivatives\pricingengine\fdm_engine\fdm_ghw_solver.cpp">
+      <Filter>ds_interestrate_derivatives</Filter>
+    </ClCompile>
+    <ClCompile Include="ds_interestrate_derivatives\pricingengine\fdm_engine\fdm_ra_engine_ghw.cpp">
+      <Filter>ds_interestrate_derivatives</Filter>
+    </ClCompile>
+    <ClCompile Include="ds_interestrate_derivatives\pricingengine\fdm_engine\fdm_ra_stepcondition_ghw.cpp">
+      <Filter>ds_interestrate_derivatives</Filter>
+    </ClCompile>
+    <ClCompile Include="ds_interestrate_derivatives\pricingengine\mc_powerspread_note_lsmc_engine.cpp">
+      <Filter>ds_interestrate_derivatives</Filter>
+    </ClCompile>
+    <ClCompile Include="ds_interestrate_derivatives\pricingengine\mc_powerspread_swap_lsmc_engine.cpp">
+      <Filter>ds_interestrate_derivatives</Filter>
+    </ClCompile>
+    <ClCompile Include="ds_interestrate_derivatives\pricingengine\mc_rangeaccrual_note_lsmc_engine.cpp">
+      <Filter>ds_interestrate_derivatives</Filter>
+    </ClCompile>
+    <ClCompile Include="ds_interestrate_derivatives\pricingengine\mc_rangeaccrual_swap_lsmc_engine.cpp">
+      <Filter>ds_interestrate_derivatives</Filter>
+    </ClCompile>
+    <ClCompile Include="ds_interestrate_derivatives\pricingengine\tree_engine\discretized_callable_bond.cpp">
+      <Filter>ds_interestrate_derivatives</Filter>
+    </ClCompile>
+    <ClCompile Include="ds_interestrate_derivatives\pricingengine\tree_engine\tree_callable_bond_engine.cpp">
+      <Filter>ds_interestrate_derivatives</Filter>
+    </ClCompile>
+    <ClCompile Include="ds_interestrate_derivatives\model\generalized_hullwhite.cpp">
+      <Filter>ds_interestrate_derivatives</Filter>
+    </ClCompile>
+    <ClCompile Include="ql\experimental\finitedifferences\fdmhullwhitemesher.cpp">
+      <Filter>experimental\finitedifferences</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

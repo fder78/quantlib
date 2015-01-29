@@ -58,39 +58,13 @@ namespace QuantLib {
 		DayCounter dayCounter;
 	};
 
-	struct XCCySwapRateData
-	{
-			Rate spread;
-			Period tenor;
-
-			//floating leg
-			Rate fxSpot;
-			Currency floatLegCurrency;
-			Calendar floatLegCalendar;
-			BusinessDayConvention floatLegConvention;
-			DayCounter floatLegDayCounter;
-			boost::shared_ptr<IborIndex> floatLegIborIndex;
-
-			//fixed leg
-			Currency fixedLegCurrency;
-			Calendar fixedLegCalendar;
-			BusinessDayConvention fixedLegConvention;
-			DayCounter fixedLegDayCounter;
-			boost::shared_ptr<IborIndex> fixedLegIborIndex;
-			
-			//term structures
-			Handle<YieldTermStructure> floatLegDiscTermStructureHandle;
-			Handle<YieldTermStructure> fixedLegDiscTermStructureHandle;
-	};
 
 	std::vector<std::pair<Integer, Rate> > yield_curve_bootstrapping(Date evaluationDate,
 		std::vector<DepoRateData> deposit,
 		std::vector<FutRateData> futures,
 		std::vector<FraRateData> fras,
 		std::vector<SwapRateData> swaps,
-		std::vector<BondRateData> bonds
-		//,std::vector<XCCySwapRateData> xccys
-		);
+		std::vector<BondRateData> bonds);
 
 }
 

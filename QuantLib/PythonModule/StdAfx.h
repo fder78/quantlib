@@ -5,8 +5,6 @@
 
 #include <ql/quantlib.hpp>
 
-//#include <tbb/tbbmalloc_proxy.h>
-
 #include <windows.h>
 #include <oleauto.h>
 #include <assert.h>

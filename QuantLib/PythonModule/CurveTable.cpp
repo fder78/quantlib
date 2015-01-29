@@ -2,88 +2,39 @@
 
 #include "CurveTable.h"
 
+#include "InterestRateCurveInfoWrapper.h"
+#include "YieldCurveInfoWrapperProxy.h"
+#include "FXCurveInfoWrapper.h"
+
 #include "ParamParseUtil.h"
 #include "PricingSetting.h"
-
-#include "structuredproduct_ir.h"
 
 #include "CQuery.h"
 #include "GlobalSetting.h"
 
-#include "stringUtil.h"
+#include "StringUtil.h"
 #include "EnumParser.h"
 
-#include <yield_builder.hpp>
-#include <yield_curve_bootstrapping.hpp>
+#include "yield_builder.hpp"
+#include "CurveTableUtil.h"
 
-#include <ql/instruments/bonds/fixedratebond.hpp>
+#include "XMLValue.h"
+#include "XMLStream.h"
 
-#include <atlstr.h>
+#include "hibor3m.hpp"
+#include "cd91.hpp"
+#include "BloombergCaller.h"
+#include "ShiftOption.h"
 
-#include <ql/indexes/ibor/hibor3m.hpp>
-#include <ql/indexes/ibor/cd91.hpp>
+#include "pricing_functions/hull_white_calibration.hpp"
+#include "pricing_functions/single_hull_white_calibration.hpp"
 
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 
-#include <hull_white_calibration.hpp>
-
 CurveTable::CurveTable()
 {
 }
-
-enum E_YieldDataType
-{
-	YDT_Deposit,
-	YDT_Futures,
-	YDT_FRA,
-	YDT_Swap,
-	YDT_Bond,
-};
-
-class YieldDataTypeParser : public EnumParser<YieldDataTypeParser, E_YieldDataType>
-{
-public:
-	YieldDataTypeParser() { }
-
-public:
-	void BuildEnumMap()
-	{
-		AddEnum( L"D", YDT_Deposit );
-		AddEnum( L"F", YDT_Futures );
-		AddEnum( L"FR", YDT_FRA );
-		AddEnum( L"S", YDT_Swap );
-		AddEnum( L"B", YDT_Bond );
-	}
-};
-
-typedef std::map<std::wstring, std::wstring> ParamMap;
-
-void ParseParam( const std::wstring& paramStr, OUT ParamMap& res )
-{
-	std::vector<std::wstring> params;
-	boost::algorithm::split( params, paramStr, boost::is_any_of( L"," ), boost::algorithm::token_compress_on );
-
-	for each( const std::wstring& param in params )
-	{
-		std::wstring::size_type commaPos = param.find( L"=" );
-		std::wstring paramName = param.substr( 0, commaPos );
-		std::wstring value = param.substr( commaPos + 1, std::wstring::npos );
-
-		boost::trim( paramName );
-		boost::trim( value );
-
-		res.insert( std::make_pair( paramName, value ) );
-	}
-}
-
-enum E_CurrencyType
-{
-	CT_KRW,
-	CT_USD,
-	CT_HKD,
-	CT_JPY,
-};
 
 void CurveTable::Init()
 {
@@ -91,324 +42,87 @@ void CurveTable::Init()
 	m_fxTable.clear();
 	m_cdsTable.clear();
 	m_corrMap.clear();
-	m_hwTable.clear();
+	m_capVolTable.clear();
+	m_swaptionVolTable.clear();
+	m_hwPeriodTable.clear();
+	m_volTable.clear();
+	m_proxyTable.clear();
 }
 
-class CurrencyTypeParser : public EnumParser<CurrencyTypeParser, E_CurrencyType>
+boost::shared_ptr<YieldCurveInfoWrapper> CurveTable::GetYieldCurve( const std::wstring& codedCode, const ShiftOption& shiftOption )
 {
-public:
-	CurrencyTypeParser() { }
-
-public:
-	void BuildEnumMap()
-	{
-		AddEnum( L"KRW", CT_KRW );
-		AddEnum( L"USD", CT_USD );
-		AddEnum( L"HKD", CT_HKD );
-		AddEnum( L"JPY", CT_JPY );
-	}
-};
-
-Period ParsePeriod( const std::wstring& period )
-{
-	wchar_t code = period.back();
-	int num = boost::lexical_cast<int>( period.substr( 0, period.length() - 1 ) );
-	switch( code )
-	{
-	case L'd':
-	case L'D':
-		return Period( num, Days );
-	case L'w':
-	case L'W':
-		return Period( num, Weeks );
-	case L'm':
-	case L'M':
-		return Period( num, Months );
-	case L'y':
-	case L'Y':
-		return Period( num, Years );
-	}
-
-	QL_ASSERT( false, "DB에서 금리의 Period가 이상합니다. d, w, m, y 중 하나여야 합니다" );
-	return Period( num, Days );
-}
-
-void ParseDepoRateData( const std::wstring& tenor, const ParamMap& paramMap, OUT DepoRateData& out, Real value )
-{
-	out.depoRateQuote = value;
-	out.maturity = ::ParsePeriod( tenor );
-
-	out.endOfMonth = false;
-	out.bdc = BusinessDayConventionParser::ParseEnum( paramMap.find( L"BDC" )->second );
-	out.calendar = CalendarParser::ParseEnum( paramMap.find( L"Calendar" )->second );
-	out.dayCounter = DayCounterParser::ParseEnum( paramMap.find( L"DayCounter" )->second );
-	out.fixingDays = boost::lexical_cast<int>( paramMap.find( L"FixingDays" )->second );
-}
-
-void ParseFuturesRateData( const std::wstring& tenor, const ParamMap& paramMap, OUT FutRateData& out, Real value )
-{
-	out.futPriceQuote = ( 1. - value ) * 100.;
-
-	out.imm = Date( boost::lexical_cast<BigInteger>( paramMap.find( L"Date" )->second ) );
-	out.matMonths = 3;
-	out.bdc = ModifiedFollowing;
-
-	out.endOfMonth = false;
-	out.calendar = CalendarParser::ParseEnum( paramMap.find( L"Calendar" )->second );
-	out.dayCounter = DayCounterParser::ParseEnum( paramMap.find( L"DayCounter" )->second );
-}
-
-void ParseFRARateData( const std::wstring& tenor, const ParamMap& paramMap, OUT FraRateData& out, Real value )
-{
-	out.fraRateQuote = value;
-
-	out.monthsToStart = 3;
-	out.monthsToEnd = ::ParsePeriod( tenor ).length();
-
-	out.endOfMonth = false;
-	out.bdc = BusinessDayConventionParser::ParseEnum( paramMap.find( L"BDC" )->second );
-	out.calendar = CalendarParser::ParseEnum( paramMap.find( L"Calendar" )->second );
-	out.dayCounter = DayCounterParser::ParseEnum( paramMap.find( L"DayCounter" )->second );
-}
-
-void ParseSwapRateData( const std::wstring& tenor, const ParamMap& paramMap, OUT SwapRateData& out, Real value )
-{
-	out.swapRateQuote = value;
-	out.maturity = ::ParsePeriod( tenor );
-
-	out.bdc = BusinessDayConventionParser::ParseEnum( paramMap.find( L"BDC" )->second );
-	out.calendar = CalendarParser::ParseEnum( paramMap.find( L"Calendar" )->second );
-	out.dayCounter = DayCounterParser::ParseEnum( paramMap.find( L"DayCounter" )->second );
-	out.fixedFreq = FrequencyParser::ParseEnum( paramMap.find( L"FixedFreq" )->second );
-	out.iborIndex = IborIndexParser::ParseEnum( paramMap.find( L"IborIndex" )->second );
-}
-
-void ParseBondRateData( const std::wstring& tenor, const ParamMap& paramMap, OUT BondRateData& out, Real value )
-{
-	out.maturity = ::ConvertToDate( tenor );
-	out.issueDate = ::ConvertToDate( paramMap.find( L"IssueDate" )->second );
-	out.cpn = boost::lexical_cast<Real>( paramMap.find( L"CPN" )->second );
-	out.calendar = CalendarParser::ParseEnum( paramMap.find( L"Calendar" )->second );
-	out.dayCounter = DayCounterParser::ParseEnum( paramMap.find( L"DayCounter" )->second );
-	out.cpnFreq = FrequencyParser::ParseEnum( paramMap.find( L"CPNFreq" )->second );
-	out.settle = boost::lexical_cast<Natural>( paramMap.find( L"Settle" )->second );
-
-	Schedule schedule(out.issueDate, out.maturity, Period( out.cpnFreq ), out.calendar,
-		Unadjusted, Unadjusted, DateGeneration::Backward, false);
-
-	std::vector<Rate> cpns( schedule.size(), out.cpn );
-
-	FixedRateBond b( out.settle, 100., schedule, cpns, out.dayCounter );
-	RelinkableHandle<YieldTermStructure> discountingTermStructure;
-	boost::shared_ptr<PricingEngine> bondEngine(
-		new DiscountingBondEngine(discountingTermStructure));
-
-	b.setPricingEngine( bondEngine );	
-	out.quote = b.cleanPrice( value, out.dayCounter, Compounded, out.cpnFreq );
-}
-
-void QueryRecentCurveData( const std::wstring& code, OUT CQuery& dbConnector, OUT Date& rcvDate )
-{
-	BOOL conRes = dbConnector.Connect( 4, DB_SERVER_NAME, DB_ID, DB_PASSWORD );
-
-	CString query_str;
-	query_str.Format( L"select count(*) as cnt, max(ReceiveDate) as RcvDate from `ficc_drvs`.`curves` where ReceiveDate<='%s' and CurveCode='%s'", ::ToWString( PricingSetting::instance().GetEvaluationDate() ).c_str(), code.c_str() );
-	dbConnector.Exec( (const wchar_t*)query_str );
-
-	dbConnector.Fetch();
-	if( !boost::lexical_cast<int>( dbConnector.GetStr( L"cnt" ) ) )
-	{
-		QL_ASSERT( false, "존재하지 않는 커브" + ::ToString( code ) + "가 입력되었습니다." );
-	}
-
-	rcvDate = ::ConvertToDate( dbConnector.GetStr( L"RcvDate" ) );
-	dbConnector.Clear();
-
-	query_str.Format( L"select B.CurveCode, B.Tenor, A.Param, B.Value from ficc_drvs.curves as B left outer join ficc_drvs.curve_type as A on ( A.CurveCode=B.CurveCode and ( A.Tenor = B.Tenor or A.Tenor='all' ) ) where B.CurveCode='%s' and ReceiveDate='%s'", code.c_str(), ::ToWString( rcvDate ).c_str() );
-
-	dbConnector.Exec( (const wchar_t*)query_str );
-	if( !dbConnector.GetNumRow() )
-	{
-		QL_ASSERT( false,  "존재하지 않는 커브" + ::ToString( code ) + "가 입력되었습니다." );
-	}
-}
-
-std::pair<boost::shared_ptr<YieldCurveData>, std::vector<Real> > LoadCurve( const std::wstring& code ) 
-{
-	if( boost::find_first( code, L"_CRS" ) )
-	{
-		std::vector<std::wstring> codeVec;
-		boost::split( codeVec, code, boost::is_any_of( L"_" ), boost::algorithm::token_compress_on );
-
-		boost::shared_ptr<FXCurveData> fxCurve( CurveTable::instance().GetFXCurve( codeVec[ 0 ] + L"_FX" ) );
-		Real spot = fxCurve->m_fwdValue.front();
-		
-		boost::shared_ptr<YieldCurveData> res( new YieldCurveData );
-		boost::shared_ptr<YieldTermStructure> foreignIRS( build_yield_curve( *CurveTable::instance().GetYieldCurve( codeVec[ 0 ] )->GetCurveData() ) );
-
-		res->dates.resize( fxCurve->m_fwdValue.size() );
-		res->yields.resize( fxCurve->m_fwdValue.size() );
-		res->dc = Actual365Fixed();
-
-		for( size_t i = 1; i < fxCurve->m_fwdValue.size(); i++ )
-		{
-			Real t = Actual365Fixed().yearFraction( fxCurve->m_fwdDate[ 0 ], fxCurve->m_fwdDate[ i ] );
-			res->dates[ i ] = fxCurve->m_fwdDate[ i ];
-			res->yields[ i ] = std::log( fxCurve->m_fwdValue[ i ] / spot * std::exp( foreignIRS->zeroRate( t, Continuous ) * t ) ) / t;
-		}
-
-		res->dates[ 0 ] = Date( fxCurve->m_fwdDate.front().serialNumber(), 0 );
-		res->yields[ 0 ] = res->yields[ 1 ];
-
-		return std::make_pair( res, res->yields );
-	}
-
-	CQuery dbConnector;
-	Date rcvDate;
-	::QueryRecentCurveData( code, dbConnector, rcvDate );
-
-	boost::shared_ptr<YieldCurveData> curveData( new YieldCurveData );
-
-	curveData->dates.reserve( dbConnector.GetNumRow() );
-	curveData->yields.reserve( dbConnector.GetNumRow() );
-	curveData->dc = Actual365Fixed();
-
-	std::vector<Real> yieldData;
-
-	std::vector<DepoRateData> deposits;
-	std::vector<FutRateData> futures;
-	std::vector<FraRateData> fras;
-	std::vector<SwapRateData> swaps;
-	std::vector<BondRateData> bonds;
-
-	while( !dbConnector.Fetch() )
-	{
-		ParamMap paramMap;
-		::ParseParam( dbConnector.GetStr( L"Param" ), paramMap );
-
-		E_YieldDataType type = YieldDataTypeParser::ParseEnum( paramMap[ L"Type" ] );
-
-		switch( type )
-		{
-		case YDT_Deposit:
-			yieldData.push_back( boost::lexical_cast<double>( dbConnector.GetStr( L"Value" ) ) );
-			deposits.resize( deposits.size() + 1 );
-			::ParseDepoRateData( dbConnector.GetStr( L"Tenor" ), paramMap, deposits.back(), yieldData.back() );
-			break;
-		case YDT_Futures:
-			yieldData.push_back( ( 100. - boost::lexical_cast<double>( dbConnector.GetStr( L"Value" ) ) ) / 100. );
-			futures.resize( futures.size() + 1 );
-			::ParseFuturesRateData( dbConnector.GetStr( L"Tenor" ), paramMap, futures.back(), yieldData.back() );
-			break;
-		case YDT_FRA:
-			yieldData.push_back( boost::lexical_cast<double>( dbConnector.GetStr( L"Value" ) ) );
-			fras.resize( fras.size() + 1 );
-			::ParseFRARateData( dbConnector.GetStr( L"Tenor" ), paramMap, fras.back(), yieldData.back() );;
-			break;
-		case YDT_Swap:
-			yieldData.push_back( boost::lexical_cast<double>( dbConnector.GetStr( L"Value" ) ) );
-			swaps.resize( swaps.size() + 1 );
-			::ParseSwapRateData( dbConnector.GetStr( L"Tenor" ), paramMap, swaps.back(), yieldData.back() );
-			break;
-		case YDT_Bond:
-			yieldData.push_back( boost::lexical_cast<double>( dbConnector.GetStr( L"Value" ) ) );
-			bonds.resize( bonds.size() + 1 );
-			::ParseBondRateData( dbConnector.GetStr( L"Tenor" ), paramMap, bonds.back(), yieldData.back() );
-			break;
-		}
-	}
-
-	std::vector<std::pair<Integer, Rate> > temp = yield_curve_bootstrapping( rcvDate, deposits, futures, fras, swaps, bonds );
-	curveData->dates.reserve( temp.size() );
-	curveData->yields.reserve( temp.size() );
-
-	for each( std::pair<Integer, Rate> v in temp )
-	{
-		curveData->dates.push_back( Date( PricingSetting::instance().GetEvaluationDate() + v.first ) );
-		curveData->yields.push_back( v.second );
-	}
-
-	Date minDate = PricingSetting::instance().GetEvaluationDate();
-
-	// 가장 최근 이자율을 이자율받은날의 이자율로 박아준다!
-	if( curveData->dates.front().serialNumber() >= minDate.serialNumber() )
-	{
-		curveData->dates.insert( curveData->dates.begin(), Date( minDate.serialNumber(), 0 ) );
-
-		volatile Real firstYield = yieldData.front();
-		yieldData.insert( yieldData.begin(), firstYield );
-
-		volatile Real firstSpot = curveData->yields.front();
-		curveData->yields.insert( curveData->yields.begin(), firstSpot );
-	}
-
-	curveData->dc = Actual365Fixed();
-	return std::make_pair( curveData, yieldData );
-}
-
-
-boost::shared_ptr<YieldCurveInfoWrapper> CurveTable::GetYieldCurve( const std::wstring& codedCode )
-{
-	YieldCurveTable::const_iterator iter = m_table.find( codedCode );
+	YieldCurveTable::const_iterator iter = m_table.find( std::make_pair( codedCode, shiftOption ) );
 
 	if( iter != m_table.end() )
 	{
 		return iter->second.first;
 	}
 
-	std::vector<std::wstring> codes = ::Split( codedCode, boost::is_any_of( L"|" ) );
-	std::wstring code = codes[ 0 ];
-
-	std::pair<boost::shared_ptr<YieldCurveData>, std::vector<Real> > curveData = ::LoadCurve( code );
-	boost::shared_ptr<YieldCurveInfoWrapper> wrapper( new YieldCurveInfoWrapper( codedCode, curveData.first ) );
-
-	if( codes.size() > 1 )
+	if( boost::find_first( codedCode, L"_FX" ) )
 	{
-		Real delta = boost::lexical_cast<Real>( codes[ 1 ] ) / 10000.;
-		wrapper->ShiftCurve( delta );
+		std::vector<std::wstring> codeVec;
+		boost::split( codeVec, codedCode, boost::is_any_of( L"_" ), boost::algorithm::token_compress_on );
+
+		std::wstring irsCode = codeVec[ 0 ];
+		std::wstring crsCode = irsCode + L"_CRS";
+
+		boost::shared_ptr<InterestRateCurveInfoWrapper> irs = boost::dynamic_pointer_cast<InterestRateCurveInfoWrapper>( GetYieldCurve( irsCode, ShiftOption::ShiftNothing ) );
+		boost::shared_ptr<InterestRateCurveInfoWrapper> crs;
+		YieldCurveTable::const_iterator iter2 = m_table.find( std::make_pair( crsCode, shiftOption ) );
+		if( iter2 != m_table.end() )
+		{
+			crs = boost::dynamic_pointer_cast<InterestRateCurveInfoWrapper>( iter2->second.first );
+		}
+		else
+		{
+			crs.reset( new InterestRateCurveInfoWrapper( crsCode, ::LoadCRSCurve( crsCode, ShiftOption::ShiftNothing, shiftOption ).first, shiftOption ) );
+		}
+
+		boost::shared_ptr<FXCurveData> fxData = GetFXCurve( codedCode, shiftOption );
+
+		HistoricalVolMap::iterator vol_iter = m_volTable.find( codedCode );
+		Real hVol;
+		if( vol_iter == m_volTable.end() )
+		{
+			hVol = ::GetHistoricalVolWithBloomberg( irsCode + L"KRW Curncy", 120 );
+			m_volTable.insert( std::make_pair( codedCode, hVol ) );
+		}
+		else
+		{
+			hVol = vol_iter->second;
+		}
+
+		boost::shared_ptr<FXCurveInfoWrapper> fxCurveWrapper( new FXCurveInfoWrapper( fxData->fwdValue[ 0 ], codedCode, irs, crs, hVol, fxData ) );
+		m_table.insert( std::make_pair( std::make_pair( codedCode, shiftOption ), std::make_pair( fxCurveWrapper, irs->GetCurveData()->yields ) ) );
+
+		return fxCurveWrapper;
 	}
-	
-	m_table.insert( std::make_pair( codedCode, std::make_pair( wrapper, curveData.second ) ) );
+
+	std::pair<boost::shared_ptr<YieldCurveData>, std::vector<Real> > curveData;
+	boost::shared_ptr<YieldCurveInfoWrapper> wrapper;
+
+	if( boost::find_first( codedCode, L"_CRS" ) )
+	{
+		curveData = ::LoadCRSCurve( codedCode, shiftOption, ShiftOption::ShiftNothing );
+		wrapper.reset( new InterestRateCurveInfoWrapper( codedCode, curveData.first, shiftOption ) );
+	}
+	else
+	{
+		std::vector<std::wstring> codes = ::Split( codedCode, boost::is_any_of( L"-" ) );
+		std::wstring code = codes[ 0 ];
+		ShiftOption opt( shiftOption );
+		if( codes.size() > 1 )
+		{
+			Real shift = boost::lexical_cast<Real>( codes[ 1 ] ) / 100.;
+			opt = ShiftOption( ShiftOption::ST_ShiftAll, shift );
+		}
+		curveData = ::LoadCurve( code, opt );
+
+		wrapper.reset( new InterestRateCurveInfoWrapper( codedCode, curveData.first, shiftOption ) );
+	}
+
+	m_table.insert( std::make_pair( std::make_pair( codedCode, shiftOption ), std::make_pair( wrapper, curveData.second ) ) );
 	return wrapper;
-}
-
-CurveTable::yield_mapped_type CurveTable::GetCurveData( const std::wstring& code )
-{
-	// Data 로드
-	GetYieldCurve( code );
-
-	YieldCurveTable::const_iterator iter = m_table.find( code );
-	QL_ASSERT( iter != m_table.end(), "KRW/USD/HKD 외의 금리코드가 입력되었습니다." );
-
-	return iter->second;
-}
-
-boost::shared_ptr<CDSCurveData> LoadCDSCurve( const std::wstring& code )
-{
-	CQuery dbConnector;
-	Date rcvDate;
-	try
-	{
-		::QueryRecentCurveData( code, dbConnector, rcvDate );
-	}
-	catch( const std::exception& )
-	{
-		return LoadCDSCurve( L"MeanCDS00000" );
-	}
-	
-
-	boost::shared_ptr<CDSCurveData> curveData = boost::shared_ptr<CDSCurveData>( new CDSCurveData() );
-
-	while( !dbConnector.Fetch() )
-	{
-		curveData->m_tenors.push_back( ParsePeriod( dbConnector.GetStr( L"Tenor" ) ) );
-		curveData->m_quoted_spreads.push_back( boost::lexical_cast<Real>( dbConnector.GetStr( L"Value" ) ) );
-	}
-
-	curveData->m_tenors.insert( curveData->m_tenors.begin(), 1 * Days );
-	curveData->m_quoted_spreads.insert( curveData->m_quoted_spreads.begin(), curveData->m_quoted_spreads.front() );
-
-	return curveData;
 }
 
 boost::shared_ptr<CDSCurveData> CurveTable::GetCDSCurve( const std::wstring& code )
@@ -425,67 +139,13 @@ boost::shared_ptr<CDSCurveData> CurveTable::GetCDSCurve( const std::wstring& cod
 	return iter->second;
 }
 
-enum E_DateType
+boost::shared_ptr<FXCurveData> CurveTable::GetFXCurve( const std::wstring& code, const ShiftOption& shiftOption )
 {
-	DT_Tenor,
-	DT_Date,
-};
-
-class DateTypeParser : public EnumParser<DateTypeParser, E_DateType>
-{
-public:
-	void BuildEnumMap()
-	{
-		AddEnum( L"T", DT_Tenor );
-		AddEnum( L"D", DT_Date );
-	}
-};
-
-boost::shared_ptr<FXCurveData> LoadFXCurve( const std::wstring& code )
-{
-	CQuery dbConnector;
-	Date rcvDate;
-	::QueryRecentCurveData( code, dbConnector, rcvDate );
-
-	boost::shared_ptr<FXCurveData> curveData = boost::shared_ptr<FXCurveData>( new FXCurveData() );
-
-	while( !dbConnector.Fetch() )
-	{
-		ParamMap paramMap;
-		::ParseParam( dbConnector.GetStr( L"Param" ), paramMap );
-
-		Date date;
-		std::wstring dateValue = dbConnector.GetStr( L"Tenor" );
-		switch( DateTypeParser::ParseEnum( paramMap[ L"DateType" ] ) )
-		{
-		case DT_Tenor:
-			date = rcvDate + ::ParsePeriod( dateValue );
-			break;
-		case DT_Date:
-			date = ::ConvertToDate( dateValue );
-			break;
-		}
-
-		curveData->m_fwdDate.push_back( date );
-		curveData->m_fwdValue.push_back( boost::lexical_cast<Real>( dbConnector.GetStr( L"Value" ) ) );
-	}
-
-	if( !curveData->m_fwdDate.empty() )
-	{
-		curveData->m_fwdDate.push_back( curveData->m_fwdDate.back() + 20 * Years );
-		curveData->m_fwdValue.push_back( curveData->m_fwdValue.back()	);
-	}
-
-	return curveData;
-}
-
-boost::shared_ptr<FXCurveData> CurveTable::GetFXCurve( const std::wstring& code )
-{
-	FXCurveTable::const_iterator iter = m_fxTable.find( code );
+	FXCurveTable::const_iterator iter = m_fxTable.find( std::make_pair( code, shiftOption ) );
 	if( iter == m_fxTable.end() )
 	{
-		boost::shared_ptr<FXCurveData> curveData = ::LoadFXCurve( code );
-		m_fxTable.insert( std::make_pair( code, curveData ) );
+		boost::shared_ptr<FXCurveData> curveData = ::LoadFXCurve( code, shiftOption );
+		m_fxTable.insert( std::make_pair( std::make_pair( code, shiftOption ), curveData ) );
 
 		return curveData;
 	}
@@ -493,62 +153,71 @@ boost::shared_ptr<FXCurveData> CurveTable::GetFXCurve( const std::wstring& code 
 	return iter->second;
 }
 
-boost::shared_ptr<HullWhiteParameters> CurveTable::GetHWParams( const std::wstring& codedCode, const YieldCurveInfoWrapper* curveData )
+boost::shared_ptr<HullWhiteParameters> CurveTable::GetHWParams( const std::wstring& codedCode, Period tenor, const ShiftOption& so )
 {
-	std::wstring code = Split( codedCode, boost::is_any_of( "_|" ) )[ 0 ];
+	std::wstring code = Split( codedCode, boost::is_any_of( "_|-" ) )[ 0 ];
 
-	HWTable::const_iterator iter = m_hwTable.find( code );
-	if( iter != m_hwTable.end() )
+	HWPeriodTable::const_iterator iter = m_hwPeriodTable.find( std::make_pair( std::make_pair( code, so ), tenor ) );
+	if( iter != m_hwPeriodTable.end() )
 	{
 		return iter->second;
 	}
 
-	CQuery dbConnector;
-	Date rcvDate;
-	::QueryRecentCurveData( code + L"_CAPVOL", dbConnector, rcvDate );
-
-	std::vector<Size> tenors;
-	std::vector<Real> vols;
-
-	std::wstring paramStr;
-
-	CapVolData volData;
-
-	while( !dbConnector.Fetch() )
+	// Global한 HWParam이 있으면 그걸 쓴다
+	iter = m_hwPeriodTable.find( std::make_pair( std::make_pair( code, so ), 0 * Days ) );
+	if( iter != m_hwPeriodTable.end() )
 	{
-		Period tenor = ::ParsePeriod( dbConnector.GetStr( L"Tenor" ) );
-		volData.tenors.push_back( tenor.length() );
-		volData.vols.push_back( boost::lexical_cast<Real>( dbConnector.GetStr( L"Value" ) ) );
-
-		paramStr = dbConnector.GetStr( L"Param" );
+		return iter->second;
 	}
 
-	ParamMap paramMap;
-	::ParseParam( paramStr, paramMap );
+	boost::shared_ptr<InterestRateCurveInfoWrapper> ircw = boost::dynamic_pointer_cast<InterestRateCurveInfoWrapper>( GetYieldCurve( codedCode, ShiftOption::ShiftNothing ) );
 
-	boost::shared_ptr<IborIndex> iborIdx( IborIndexParser::ParseEnum( paramMap[ L"IborIndex" ] ) );
-	Frequency fixedFreq = FrequencyParser::ParseEnum( paramMap[ L"FixedFreq" ] );
-	DayCounter dayCounter = DayCounterParser::ParseEnum( paramMap[ L"DayCounter" ] );
+	// 스왑션이 있는 경우 먼저 스왑션으로 해보고
+	SwaptionVolTable::iterator volTableIter = m_swaptionVolTable.find( std::make_pair( code, so ) );
+	boost::shared_ptr<SwaptionVolData> swaptionVolData;
+	if( volTableIter != m_swaptionVolTable.end() )
+	{
+		swaptionVolData = volTableIter->second;
+	}
+	else
+	{
+		swaptionVolData = ::LoadSwaptionVol( code, so, ircw );
+		m_swaptionVolTable.insert( std::make_pair( std::make_pair( code, so ), swaptionVolData ) );
+	}
 
-	boost::shared_ptr<YieldTermStructure> yieldTS = ::build_yield_curve( *curveData->GetCurveData() );
-	iborIdx = iborIdx->clone( Handle<YieldTermStructure>( yieldTS ) );
-	iborIdx->clearFixings();
-	iborIdx->addFixing( iborIdx->fixingCalendar().advance( curveData->GetCurveData()->dates.front(), 0, Days, Preceding ), curveData->GetCurveData()->yields.front() );
+	if( swaptionVolData )
+	{
+		boost::shared_ptr<HullWhiteParameters> hwParam( ::CalcFromSwaption( swaptionVolData, tenor, ircw ) );
+		m_hwPeriodTable.insert( std::make_pair( std::make_pair( std::make_pair( code, so ), tenor ), hwParam ) );
+		return hwParam;
+	}
 
-	boost::shared_ptr<HullWhiteTimeDependentParameters> hwParam( new 
-		HullWhiteTimeDependentParameters( ::calibration_hull_white( PricingSetting::instance().GetEvaluationDate(), iborIdx, volData, fixedFreq, dayCounter ) ) );
+	// 없으면 캡볼로
+	CapVolTable::iterator capVolTableIter = m_capVolTable.find( std::make_pair( code, so ) );
+	boost::shared_ptr<CapVolData> capVolData;
+	if( capVolTableIter != m_capVolTable.end() )
+	{
+		// 지저분하지만 일단 두자.. 나중 리팩터링해야..
+		capVolData = capVolTableIter->second;
+	}
+	else
+	{
+		capVolData = ::LoadCapVol( code, so, ircw );
+		m_capVolTable.insert( std::make_pair( std::make_pair( codedCode, so ), capVolData ) );
+	}
 
-	m_hwTable.insert( std::make_pair( code, hwParam ) );
+	boost::shared_ptr<HullWhiteParameters> hwParam( ::CalcFromCapVol( *capVolData, tenor ) );
+	m_hwPeriodTable.insert( std::make_pair( std::make_pair( std::make_pair( code, so ), tenor ), hwParam ) );
 
 	return hwParam;
 }
 
 QuantLib::Real CurveTable::GetCorr( const std::wstring& codedCode1, const std::wstring& codedCode2 )
 {
-	std::vector<std::wstring> codes1 = ::Split( codedCode1, boost::is_any_of( L"|" ) );
+	std::vector<std::wstring> codes1 = ::Split( codedCode1, boost::is_any_of( L"-" ) );
 	std::wstring code1 = codes1[ 0 ];
 
-	std::vector<std::wstring> codes2 = ::Split( codedCode2, boost::is_any_of( L"|" ) );
+	std::vector<std::wstring> codes2 = ::Split( codedCode2, boost::is_any_of( L"-" ) );
 	std::wstring code2 = codes2[ 0 ];
 
 	std::wstring minCode = min( code1, code2 );
@@ -571,7 +240,7 @@ QuantLib::Real CurveTable::GetCorr( const std::wstring& codedCode1, const std::w
 
 	m_corrMap.insert( std::make_pair( std::make_pair( minCode, maxCode ), corr ) );
 
-	return corr;
+ 	return corr;
 }
 
 std::pair<Real, Real> CurveTable::GetCorrRcvy( const std::wstring& code )
@@ -584,10 +253,11 @@ std::pair<Real, Real> CurveTable::GetCorrRcvy( const std::wstring& code )
 
 	CQuery dbConnector;
 	BOOL conRes = dbConnector.Connect( 4, DB_SERVER_NAME, DB_ID, DB_PASSWORD );
-	CString query_str;
-	query_str.Format( L"select count(*) as cnt, max(ReceiveDate) as RcvDate from `ficc_drvs`.`percontractinfo` where ReceiveDate<='%s' and ContractCode='%s'", ::ToWString( PricingSetting::instance().GetEvaluationDate() ).c_str(), code.c_str() );
-	dbConnector.Exec( (const wchar_t*)query_str );
+	
+	std::wostringstream buf;
+	buf << boost::wformat( L"select count(*) as cnt, max(ReceiveDate) as RcvDate from `ficc_drvs`.`percontractinfo` where ReceiveDate<='%s' and ContractCode='%s'" ) % ::ToWString( PricingSetting::instance().GetDataDate() ).c_str() % code.c_str();
 
+	dbConnector.Exec( buf.str().c_str() );
 	dbConnector.Fetch();
 
 	if( !boost::lexical_cast<int>( dbConnector.GetStr( L"cnt" ) ) )
@@ -598,8 +268,9 @@ std::pair<Real, Real> CurveTable::GetCorrRcvy( const std::wstring& code )
 	Date rcvDate = ::ConvertToDate( dbConnector.GetStr( L"RcvDate" ) );
 	dbConnector.Clear();
 
-	query_str.Format( L"select * from ficc_drvs.percontractinfo where ContractCode='%s' and ReceiveDate='%s'", code.c_str(), ::ToWString( rcvDate ).c_str() );
-	dbConnector.Exec( (const wchar_t*)query_str );
+
+	buf << boost::wformat( L"select * from ficc_drvs.percontractinfo where ContractCode='%s' and ReceiveDate='%s'" ) % code.c_str() % ::ToWString( rcvDate ).c_str();
+	dbConnector.Exec( buf.str().c_str() );
 
 	dbConnector.Fetch();
 
@@ -610,38 +281,226 @@ std::pair<Real, Real> CurveTable::GetCorrRcvy( const std::wstring& code )
 	return res;
 }
 
-YieldCurveInfoWrapper::YieldCurveInfoWrapper( const std::wstring& curveName, boost::shared_ptr<YieldCurveData> curveData ) : m_curveName( curveName )
-	, m_curveData( curveData )
+enum E_CurveType
 {
-	m_daysToMat.reset( new int[ m_curveData->dates.size() ] );
-	m_yields.reset( new double[ m_curveData->yields.size() ] );
-	m_curveInfo.reset( new YieldCurveInfo() );
+	CT_Yield,
+  CT_FX,
+	CT_CORR,
+	CT_CDS,
+	CT_CDS_PARAM,
+};
 
-	for( size_t i = 0; i < m_curveData->dates.size(); i++ )
+class CurveTypeParser : public EnumParser<CurveTypeParser, E_CurveType>
+{
+public:
+	void BuildEnumMap()
 	{
-		m_daysToMat[ i ] = std::max<int>( m_curveData->dates[ i ].serialNumber() - PricingSetting::instance().GetEvaluationDate().serialNumber(), 1 );
-		m_yields[ i ] = m_curveData->yields[ i ];
+		AddEnum( L"Yield", CT_Yield );
+		AddEnum( L"FX", CT_FX );
+		AddEnum( L"Corr", CT_CORR );
+		AddEnum( L"CDS", CT_CDS );
+		AddEnum( L"CDS_PARAM", CT_CDS_PARAM );
 	}
+private:
+};
 
-	m_curveInfo->day = m_daysToMat.get();
-	m_curveInfo->rate = m_yields.get();
-	m_curveInfo->size = m_curveData->dates.size();
+void CurveTable::AddCurveTable( const TiXmlElement* curveRecord )
+{
+ 	E_CurveType curveType = CurveTypeParser::ParseEnum( ::ToWString( curveRecord->Attribute( "value" ) ) );
 
-	m_hwParam = CurveTable::instance().GetHWParams( m_curveName, this );
+	switch( curveType )
+	{
+	case CT_Yield:
+		{
+			while( true )
+			{
+				try
+				{
+					XMLIStream stream( *curveRecord->FirstChildElement( "ShiftOption" ) );
+					ShiftOption so( 0. );
+
+					stream >> so;
+					
+					XMLIStream stream2( *curveRecord->FirstChildElement( "Tenor" ) );
+
+					double tenorLength, tenorUnit;
+					stream2 >> tenorLength >> tenorUnit;
+				
+					Period tenor( (int)( tenorLength ), (TimeUnit)( (int)tenorUnit ) );
+
+					std::pair<boost::shared_ptr<YieldCurveData>, std::vector<Real> > curveDataPair( ::LoadCurve( ::ToWString( curveRecord->ValueStr() ), so ) );
+					boost::shared_ptr<YieldCurveData> curveData( curveDataPair.first );
+
+					boost::shared_ptr<InterestRateCurveInfoWrapper> wrapper( new InterestRateCurveInfoWrapper( ::ToWString( curveRecord->ValueStr() ), curveData, so ) );
+					boost::shared_ptr<InterestRateCurveInfoWrapper> wrapperShiftNothing( new InterestRateCurveInfoWrapper( ::ToWString( curveRecord->ValueStr() ), curveData, so ) ); // ShiftOption::ShiftNothing ) );
+
+					boost::shared_ptr<HullWhiteParameters> hwParam;
+					if( boost::shared_ptr<SwaptionVolData> swaptionVolData = ::LoadSwaptionVol( wrapper->GetCurveName(), so, wrapperShiftNothing ) )
+					{
+						hwParam = ::CalcFromSwaption( swaptionVolData, tenor, wrapperShiftNothing );
+					}
+					else
+					{
+						boost::shared_ptr<CapVolData> capVolData = ::LoadCapVol( wrapper->GetCurveName(), so, wrapperShiftNothing );
+						hwParam = ::CalcFromCapVol( *capVolData, tenor );
+					}
+
+					m_hwPeriodTable.insert( std::make_pair( std::make_pair( std::make_pair( wrapper->GetCurveName(), so ), 0 * Days ), hwParam ) );
+					m_hwPeriodTable.insert( std::make_pair( std::make_pair( std::make_pair( wrapper->GetCurveName(), ShiftOption::ShiftNothing ), 0 * Days ), hwParam ) );
+
+					m_table[ std::make_pair( wrapper->GetCurveName(), ShiftOption::ShiftNothing ) ] = std::make_pair( wrapper, curveDataPair.second );
+					m_table[ std::make_pair( wrapper->GetCurveName(), so ) ] = std::make_pair( wrapper, curveDataPair.second );
+					break;
+				}
+				catch ( ... )
+				{
+					Sleep( 1000 );
+				}
+			}
+		}
+		break;
+	case CT_FX:
+		{
+			boost::shared_ptr<FXCurveData> curveData( new FXCurveData() );
+			for( const TiXmlElement* record = curveRecord->FirstChildElement( "Maturity" )->FirstChildElement(); record != NULL; record = record->NextSiblingElement() )
+			{
+				curveData->fwdDate.push_back( ::ConvertToDateFromBloomberg( ::ToWString( record->Attribute( "value" ) ) ) );
+			}
+
+			for( const TiXmlElement* record = curveRecord->FirstChildElement( "Spot" )->FirstChildElement(); record != NULL; record = record->NextSiblingElement() )
+			{
+				curveData->fwdValue.push_back( boost::lexical_cast<Real>( record->Attribute( "value" ) ) );
+			}
+
+			curveData->fwdDate.push_back( curveData->fwdDate.back() + 20 * Years );
+			curveData->fwdValue.push_back( curveData->fwdValue.back()	);
+
+			std::wstring curveName = ::ToWString( curveRecord->ValueStr() );
+			m_fxTable.insert( std::make_pair( std::make_pair( curveName, ShiftOption::ShiftNothing ), curveData ) );
+
+			AddCurveTable( curveRecord->FirstChildElement( "irs" )->FirstChildElement() );
+			AddCurveTable( curveRecord->FirstChildElement( "crs" )->FirstChildElement() );
+
+			m_volTable.insert( std::make_pair( curveName, XMLValue( curveRecord, "Vol" ).GetValue<Real>() ) );
+		}
+		break;
+	case CT_CORR:
+		{
+			typedef std::vector<std::pair<std::wstring, std::wstring> > TickerVec;
+			TickerVec tickerVec;
+			for( const TiXmlElement* record = curveRecord->FirstChildElement(); record != NULL; record = record->NextSiblingElement() )
+			{
+				tickerVec.push_back( std::make_pair( ::ToWString( record->ValueStr() ), ::ToWString( record->Attribute( "value" ) ) ) );
+			}
+
+			for each( const TickerVec::value_type& v1 in tickerVec )
+			{
+				for each( const TickerVec::value_type& v2 in tickerVec )
+				{
+					Real corr = ::GetHistoricalCorrWithBloomberg( v1.second, v2.second, L"WEEKLY", 52, L"ALL_CALENDAR_DAYS" );
+					m_corrMap.insert( std::make_pair( std::make_pair( v1.first, v2.first ), corr ) );
+				}
+			}
+		}
+		break;
+	case CT_CDS:
+		{
+			boost::shared_ptr<CDSCurveData> curveData( new CDSCurveData() );
+			for( const TiXmlElement* record = curveRecord->FirstChildElement( "Maturity" )->FirstChildElement(); record != NULL; record = record->NextSiblingElement() )
+			{
+				curveData->tenors.push_back( ::ParsePeriod( ::ToWString( record->Attribute( "value" ) ) ) );
+			}
+
+			for( const TiXmlElement* record = curveRecord->FirstChildElement( "Spot" )->FirstChildElement(); record != NULL; record = record->NextSiblingElement() )
+			{
+				curveData->quotedSpreads.push_back( boost::lexical_cast<Real>( record->Attribute( "value" ) ) );
+			}
+
+			m_cdsTable.insert( std::make_pair( ::ToWString( curveRecord->ValueStr() ), curveData ) );
+		}
+		break;
+	case CT_CDS_PARAM:
+		{
+			Real corr = XMLValue( curveRecord, "Corr" );
+			Real rcvry = XMLValue( curveRecord, "RecoveryRate" );
+
+			m_corrRcvyTable.insert( std::make_pair( ::ToWString( curveRecord->ValueStr() ), std::make_pair( corr, rcvry ) ) );
+		}
+		break;
+	}
 }
 
-YieldCurveInfo* YieldCurveInfoWrapper::GetInfo() const
+boost::shared_ptr<YieldCurveInfoWrapperProxy> CurveTable::GetYieldCurveProxy( const std::wstring& code )
 {
-	return m_curveInfo.get();
-}
-
-void YieldCurveInfoWrapper::ShiftCurve( Real delta )
-{
-	for( int i = 0; i < m_curveInfo->size; i++ )
+	YieldCurveWrapperProxyTable::iterator iter = m_proxyTable.find( code );
+	if( iter != m_proxyTable.end() )
 	{
-		const_cast<Real&>( m_curveInfo->rate[ i ] ) += delta;
-		const_cast<Real&>( m_curveData->yields[ i ] ) += delta;
+		return iter->second;
 	}
 
-	m_hwParam = CurveTable::instance().GetHWParams( m_curveName, this );
+	boost::shared_ptr<YieldCurveInfoWrapperProxy> proxy( new YieldCurveInfoWrapperProxy( code ) );
+	m_proxyTable.insert( std::make_pair( code, proxy ) );
+
+	return proxy;
+}
+
+boost::shared_ptr<CapVolData> CurveTable::GetCapVolData( const std::wstring& curveName, const ShiftOption& so )
+{
+	CapVolTable::const_iterator iter = m_capVolTable.find( std::make_pair( curveName, so ) );
+
+	if( iter == m_capVolTable.end() )
+	{
+		boost::shared_ptr<CapVolData> capVol = ::LoadCapVol( curveName, so, boost::dynamic_pointer_cast<InterestRateCurveInfoWrapper>( GetYieldCurve( curveName, so ) ) );
+		m_capVolTable.insert( std::make_pair( std::make_pair( curveName, so ), capVol ) );
+
+		return capVol;
+	}
+
+	return iter->second;
+}
+
+void CurveTable::SetVol( const std::wstring& curveName, Real vol )
+{
+	m_volTable[ curveName ] = vol;
+}
+
+void CurveTable::AddManualInputYTM( const std::wstring& curveCode, const std::wstring& Tenor, Real value )
+{
+	m_manualInputYTM[ std::make_pair( curveCode, Tenor ) ] = value;
+}
+
+Real CurveTable::GetNullableManualInputYTM( const ManualCurveDataTable::key_type& codeTenor ) const
+{
+	ManualCurveDataTable::const_iterator iter = m_manualInputYTM.find( codeTenor );
+	if( iter == m_manualInputYTM.end() )
+	{
+		return Null<Real>();
+	}
+
+	return iter->second;
+}
+
+void CurveTable::AddSwaptionVolTable( const std::wstring& curveCode, boost::shared_ptr<SwaptionVolData> volData )
+{
+	m_swaptionVolTable.insert( std::make_pair( std::make_pair( curveCode, ShiftOption::ShiftNothing ), volData ) );
+}
+
+void CurveTable::AddCapVolTable( const std::wstring& curveCode, const ShiftOption& shiftOption, boost::shared_ptr<CapVolData> capVolData )
+{
+	m_capVolTable.insert( std::make_pair( std::make_pair( curveCode, shiftOption ), capVolData ) );
+}
+
+boost::shared_ptr<SwaptionVolData> CurveTable::GetSwaptionVolData( const std::wstring& curveName, const ShiftOption& so )
+{
+	SwaptionVolTable::const_iterator iter = m_swaptionVolTable.find( std::make_pair( curveName, so ) );
+
+	if( iter == m_swaptionVolTable.end() )
+	{
+		boost::shared_ptr<SwaptionVolData> capVol = ::LoadSwaptionVol( curveName, so, boost::dynamic_pointer_cast<InterestRateCurveInfoWrapper>( GetYieldCurve( curveName, so ) ) );
+		m_swaptionVolTable.insert( std::make_pair( std::make_pair( curveName, so ), capVol ) );
+
+		return capVol;
+	}
+
+	return iter->second;
 }

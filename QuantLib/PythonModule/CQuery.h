@@ -13,17 +13,17 @@ private:
 	SQLHENV hEnv;							// 환경 핸들
 	SQLHDBC hDbc;							// 연결 핸들
 	SQLRETURN ret;							// 최후 실행한 SQL문의 결과값
-	char Col[MAXCOL][512];					// 바인딩될 컬럼 정보
+	char Col[MAXCOL][255];					// 바인딩될 컬럼 정보
 
 	int FindCol( const std::wstring& name ) const;				// 컬럼의 이름으로부터 번호를 찾아준다.
 
 private:
-	SQLLEN AffectCount;					// 영향받은 레코드 개수
+	SQLINTEGER AffectCount;					// 영향받은 레코드 개수
 	SQLHSTMT hStmt;							// 명령 핸들. 직접 사용할 수도 있으므로 public으로 정의
 	SQLSMALLINT nCol;						// 컬럼 개수
-	SQLLEN nRow;
+	SQLINTEGER nRow;
 	SQLWCHAR ColNameW[MAXCOL][50];			// 컬럼의 이름들 W
-	SQLLEN lCol[MAXCOL];				// 컬럼의 길이/상태 정보
+	SQLINTEGER lCol[MAXCOL];				// 컬럼의 길이/상태 정보
 
 public:
 	void PrintDiag();						// 진단 정보 출력
@@ -40,8 +40,8 @@ public:
 	int GetInt(const std::wstring& sCol);					// 정수형 컬럼 읽기
 	std::wstring GetStr(int nCol ) const;		// 문자열형 컬럼 읽기
 	std::wstring GetStr( const std::wstring& sCol ) const;		// 문자열형 컬럼 읽기
-	SQLLEN ReadBlob(LPCTSTR szSQL, void *buf);
-	void WriteBlob(LPCTSTR szSQL, void *buf, SQLLEN size);
+	int ReadBlob(LPCTSTR szSQL, void *buf);
+	void WriteBlob(LPCTSTR szSQL, void *buf, int size);
 
-	SQLLEN GetNumRow() const;
+	int GetNumRow() const { return nRow; }
 };
