@@ -52,13 +52,14 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;PYTHONMODULE_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>E:\xmlrpc-c-master\stable\include;.;..;C:\Anaconda\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../xmlrpc-c-master/stable/include;.;..;C:\Anaconda\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4819;4996</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>E:\xmlrpc-c-master\stable\bin\Debug-Static-Win32;..\lib;C:\Anaconda\libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>../../xmlrpc-c-master/stable/bin/Debug-Static-Win32;..\lib;C:\Anaconda\libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions> "libxmlrpc++.lib" "libxmlrpc.lib" "libxmlrpc_abyss.lib" "libxmlrpc_client.lib" "libxmlrpc_server.lib" "libxmlrpc_server_abyss.lib" "libxmlrpc_server_cgi.lib" "libxmlrpc_server_w32httpsys.lib" "libxmlrpc_util.lib" "libxmlrpc_xmlparse.lib" "libxmlrpc_xmltok.lib" %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -70,7 +71,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;PYTHONMODULE_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>E:\xmlrpc-c-master\stable\include;.;..;C:\Anaconda\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../xmlrpc-c-master\stable\include;.;..;C:\Anaconda\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4819;4996;4251</DisableSpecificWarnings>
     </ClCompile>
     <Link>
@@ -78,7 +79,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>E:\xmlrpc-c-master\stable\bin\Release-Static-Win32;..\lib;C:\Anaconda\libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>../../xmlrpc-c-master\stable\bin\Release-Static-Win32;..\lib;C:\Anaconda\libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>libxmlrpc++.lib;libxmlrpc.lib;libxmlrpc_abyss.lib;libxmlrpc_client.lib;libxmlrpc_server.lib;libxmlrpc_server_abyss.lib;libxmlrpc_server_cgi.lib;libxmlrpc_server_w32httpsys.lib;libxmlrpc_util.lib;libxmlrpc_xmlparse.lib;libxmlrpc_xmltok.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
