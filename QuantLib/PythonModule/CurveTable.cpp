@@ -21,8 +21,8 @@
 #include "XMLValue.h"
 #include "XMLStream.h"
 
-#include "hibor3m.hpp"
-#include "cd91.hpp"
+#include <ql/indexes/ibor/HIBOR3M.hpp>
+#include <ql/indexes/ibor/cd91.hpp>
 #include "BloombergCaller.h"
 #include "ShiftOption.h"
 

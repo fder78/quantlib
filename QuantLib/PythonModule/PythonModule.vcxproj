@@ -108,10 +108,6 @@
     <ClCompile Include="IProductParam.cpp" />
     <ClCompile Include="IRProductJob.cpp" />
     <ClCompile Include="IRProductParam.cpp" />
-    <ClCompile Include="Main.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
     <ClCompile Include="Main_python_export.cpp" />
     <ClCompile Include="makeResultXML.cpp" />
     <ClCompile Include="ParamParseUtil.cpp" />
@@ -165,7 +161,6 @@
     <ClInclude Include="BloombergCaller.h" />
     <ClInclude Include="CalculationProxy.h" />
     <ClInclude Include="CapFloorParam.h" />
-    <ClInclude Include="cd91.hpp" />
     <ClInclude Include="CDSParam.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
@@ -184,17 +179,12 @@
     <ClInclude Include="FXCurveInfoWrapper.h" />
     <ClInclude Include="FXDigitalParam.h" />
     <ClInclude Include="GlobalSetting.h" />
-    <ClInclude Include="HIBOR3M.hpp" />
     <ClInclude Include="IFunctor.h" />
     <ClInclude Include="IJob.h" />
     <ClInclude Include="InterestRateCurveInfoWrapper.h" />
     <ClInclude Include="IProductParam.h" />
     <ClInclude Include="IRProductJob.h" />
     <ClInclude Include="IRProductParam.h" />
-    <ClInclude Include="Main.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClInclude>
     <ClInclude Include="makeResultXML.h" />
     <ClInclude Include="ParamParseUtil.h" />
     <ClInclude Include="PerProcessSingleton.h" />

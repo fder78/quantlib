@@ -121,8 +121,8 @@ void FrequencyParser::BuildEnumMap()
 	AddEnum( L"OtherFrequency", OtherFrequency );
 }
 
-#include "hibor3m.hpp"
-#include "cd91.hpp"
+#include <ql/indexes/ibor/HIBOR3M.hpp>
+#include <ql/indexes/ibor/cd91.hpp>
 
 void IborIndexParser::BuildEnumMap()
 {
