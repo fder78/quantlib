@@ -522,6 +522,7 @@
     <ClInclude Include="ds_interestrate_derivatives\pricingengine\tree_engine\discretized_callable_bond.hpp" />
     <ClInclude Include="ds_interestrate_derivatives\pricingengine\tree_engine\tree_callable_bond_engine.hpp" />
     <ClInclude Include="ds_interestrate_derivatives\termstructure\fx_term_structure.hpp" />
+    <ClInclude Include="ds_interestrate_derivatives\xccyratehelper.hpp" />
     <ClInclude Include="ql\cashflows\cpicoupon.hpp" />
     <ClInclude Include="ql\cashflows\cpicouponpricer.hpp" />
     <ClInclude Include="ql\experimental\exercise\all.hpp" />
@@ -1769,6 +1770,7 @@
     <ClCompile Include="ds_interestrate_derivatives\pricingengine\mc_rangeaccrual_swap_lsmc_engine.cpp" />
     <ClCompile Include="ds_interestrate_derivatives\pricingengine\tree_engine\discretized_callable_bond.cpp" />
     <ClCompile Include="ds_interestrate_derivatives\pricingengine\tree_engine\tree_callable_bond_engine.cpp" />
+    <ClCompile Include="ds_interestrate_derivatives\xccyratehelper.cpp" />
     <ClCompile Include="ql\cashflows\cpicoupon.cpp" />
     <ClCompile Include="ql\cashflows\cpicouponpricer.cpp" />
     <ClCompile Include="ql\experimental\exercise\rebatedexercise.cpp" />

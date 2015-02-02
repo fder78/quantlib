@@ -3999,6 +3999,9 @@
     <ClInclude Include="ql\experimental\finitedifferences\fdmhullwhitemesher.hpp">
       <Filter>experimental\finitedifferences</Filter>
     </ClInclude>
+    <ClInclude Include="ds_interestrate_derivatives\xccyratehelper.hpp">
+      <Filter>ds_interestrate_derivatives</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ql\methods\montecarlo\brownianbridge.cpp">
@@ -6431,6 +6434,9 @@
     </ClCompile>
     <ClCompile Include="ql\experimental\finitedifferences\fdmhullwhitemesher.cpp">
       <Filter>experimental\finitedifferences</Filter>
+    </ClCompile>
+    <ClCompile Include="ds_interestrate_derivatives\xccyratehelper.cpp">
+      <Filter>ds_interestrate_derivatives</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
