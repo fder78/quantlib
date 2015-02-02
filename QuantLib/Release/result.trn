@@ -1,0 +1,76 @@
+<result_root>
+    <IRSFICC445>
+        <type type="string" value="VanillaSwap" />
+        <book type="string" value="IRS_KRW" />
+        <npv type="double" value="-22286542.57382567" />
+        <unitPrice type="double" value="-14.85769505" />
+        <notional type="double" value="15000000000.00000000" />
+        <cashFlow>
+            <record>
+                <date type="double" value="2015-01-23" />
+                <cashFlowValue type="double" value="-17461956.52173770" />
+            </record>
+            <record>
+                <date type="double" value="2015-02-12" />
+                <cashFlowValue type="double" value="-22312500.00000076" />
+            </record>
+        </cashFlow>
+        <evalTime type="string" value="2015-02-02 67208" />
+        <KeyExposure>
+            <KRW>
+                <kexpShift type="double" value="121.47296963" />
+                <kexp0 type="double" value="121.47296963" />
+                <kexp1 type="double" value="0.00000000" />
+                <kexp2 type="double" value="0.00000000" />
+            </KRW>
+        </KeyExposure>
+        <GammaExposure>
+            <KRW>
+                <kexpShift type="double" value="-0.00367458" />
+                <kexp0 type="double" value="-0.00367458" />
+                <kexp1 type="double" value="0.00000000" />
+                <kexp2 type="double" value="0.00000000" />
+            </KRW>
+        </GammaExposure>
+        <XGammaExposure>
+            <KRW>
+                <kxgammaexp0 type="double" value="0.00000000" />
+                <kxgammaexp1 type="double" value="0.00000000" />
+                <kxgammaexp2 type="double" value="0.00000000" />
+                <kxgammaexp3 type="double" value="0.00000000" />
+                <kxgammaexp4 type="double" value="0.00000000" />
+                <kxgammaexp5 type="double" value="0.00000000" />
+                <kxgammaexp6 type="double" value="0.00000000" />
+                <kxgammaexp7 type="double" value="0.00000000" />
+                <kxgammaexp8 type="double" value="0.00000000" />
+                <kxgammaexp9 type="double" value="0.00000000" />
+            </KRW>
+        </XGammaExposure>
+        <ChunkDeltaExposure>
+            <KRW>
+                <kexp0 type="double" value="121.47296963" />
+                <kexp1 type="double" value="0.00000000" />
+            </KRW>
+        </ChunkDeltaExposure>
+        <ChunkGammaExposure>
+            <KRW>
+                <kexp0 type="double" value="-0.00367458" />
+                <kexp1 type="double" value="0.00000000" />
+            </KRW>
+        </ChunkGammaExposure>
+        <ChunkXGammaExposure>
+            <KRW>
+                <kexp0 type="double" value="-0.00367459" />
+                <kexp1 type="double" value="0.00000000" />
+                <kexp2 type="double" value="0.00000000" />
+            </KRW>
+        </ChunkXGammaExposure>
+        <ChunkXCurveGammaExposure />
+        <VegaExposure />
+        <curves>
+            <curve>
+                <name type="string" value="KRW" />
+            </curve>
+        </curves>
+    </IRSFICC445>
+</result_root>
