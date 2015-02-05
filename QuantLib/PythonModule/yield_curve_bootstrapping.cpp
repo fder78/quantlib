@@ -1,7 +1,7 @@
 #include "StdAfx.h"
 #include "yield_curve_bootstrapping.hpp"
 #include <iostream>
-
+#include <ds_interestrate_derivatives/xccyratehelper.hpp>
 
 namespace QuantLib {
 
@@ -104,6 +104,80 @@ namespace QuantLib {
 		
 		return yieldCurve;
 
+	}
+
+	std::vector<std::pair<Integer, Rate> > crs_yield_curve_bootstrapping(Date evaluationDate,
+		Handle<YieldTermStructure> flatLegCurve,  //USD
+		Handle<YieldTermStructure> spreadLegCurve, //EUR
+		Real fxRate,
+		std::vector<std::pair<Period, Rate> > crsRate
+		) {
+
+			boost::shared_ptr<IborIndex> flatLegIborIndex(new USDLibor(Period(3,Months), flatLegCurve));
+			//flatLegIborIndex->addFixing(Date(2,August,2012),0.0044185);
+			boost::shared_ptr<IborIndex> sprdLegIborIndex(new Euribor3M(spreadLegCurve));
+			//sprdLegIborIndex->addFixing(Date(2,August,2012),0.00375);
+
+			std::vector<boost::shared_ptr<RateHelper>> instruments; instruments.empty();
+
+			Handle<YieldTermStructure> flatLegDiscTermStructureHandle = flatLegCurve;
+			Handle<YieldTermStructure> sprdLegDiscTermStructureHandle;
+
+			for(Size i=0; i<crsRate.size(); i++){
+
+				Handle<Quote> MarketSpread =  Handle<Quote>(new SimpleQuote(-crsRate[i].second));
+
+				boost::shared_ptr<XCCySwapRateHelper> XCCYHelper(
+					new  XCCySwapRateHelper(MarketSpread,
+					crsRate[i].first,
+					//flat leg
+					USDCurrency(),
+					UnitedStates(),
+					ModifiedFollowing,
+					Actual360(),
+					flatLegIborIndex,
+					flatLegDiscTermStructureHandle,
+					//spread leg
+					EURCurrency(),
+					TARGET(),
+					ModifiedFollowing,
+					Actual360(),
+					sprdLegIborIndex,
+					sprdLegDiscTermStructureHandle,
+					//general
+					fxRate,
+					Period(0,Days), 
+					XCCySwapRateHelper::BootstrapSpreadDiscCurve));
+
+				instruments.push_back(XCCYHelper);
+			}
+
+			//Bootstrap XCCY-Curve
+			bool constrainAtZero = true;
+			Real tolerance = 1.0e-10;
+			Size max = 5000;
+
+
+			Natural settlementDays = 0;
+			Calendar calendar   = TARGET();
+			DayCounter dc = Actual365Fixed();
+
+			Date referenceDate = calendar.advance (evaluationDate , settlementDays , Days );
+
+			boost :: shared_ptr < YieldTermStructure > crsCurve = boost :: shared_ptr < YieldTermStructure >( new
+				PiecewiseYieldCurve < Discount , LogLinear >( referenceDate , instruments , dc ));
+
+			std::vector<std::pair<Integer, Rate> > yieldCurve;
+			for (Size i=0; i<crsRate.size(); ++i) {
+				std::pair<Integer, Rate> temp;
+				Date endDate = TARGET().advance(evaluationDate, crsRate[i].first, ModifiedFollowing);
+				temp.first = endDate.serialNumber() - evaluationDate.serialNumber();
+				temp.second = crsCurve->zeroRate(endDate, Actual365Fixed(), Continuous).rate();
+				yieldCurve.push_back(temp);
+			}
+
+			std::sort(yieldCurve.begin(), yieldCurve.end());
+			return yieldCurve;
 	}
 
 }

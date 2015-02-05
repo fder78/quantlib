@@ -1,4 +1,6 @@
 #include "StdAfx.h"
+#include <iostream>
+#include <boost/timer.hpp>
 
 #include "VanillaSwapParam.h"
 
@@ -97,8 +99,9 @@ void VanillaSwapParam::LoadLegInfo( const TiXmlElement* record)
 			paymentLength = m_FloatingDayCounter.yearFraction( *( iter + 1 ), *iter );
 		}
 	}
-
+	boost::timer timer;
 	m_pastFixingFloating = ::Blph<xmlrpc_c::value_double>( XMLValue( record, PI_RAOBS1Ticker1 ), L"last price", m_recentFixDate ) / 100.;
+	std::cout<<timer.elapsed()<<std::endl;
 	m_payment = ( m_pastFixingFloating - m_fixedRate ) * paymentLength * m_notional * ( ( m_side == VanillaSwap::Payer ) ? 1. : -1. );
 }
 
@@ -140,6 +143,7 @@ void VanillaSwapParam::SetDataImpl( TiXmlElement* record )
 	m_calcDelta = XMLValue( record, PI_CalcDelta ) == L"Y";
 	m_calcChunkDelta = XMLValue( record, PI_CalcChunkDelta ) == L"Y";
 	m_calcVega = XMLValue( record, PI_CalcVega ) == L"Y";
+	m_calcXGamma = XMLValue( record, PI_CalcXGamma ) == L"Y";
 
 	m_effectiveDate = XMLValue( record, PI_EffectiveDate ) ;
 	m_terminationDate = XMLValue( record, PI_TerminationDate ) ;

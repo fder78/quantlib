@@ -66,6 +66,14 @@ namespace QuantLib {
 		std::vector<SwapRateData> swaps,
 		std::vector<BondRateData> bonds);
 
+	std::vector<std::pair<Integer, Rate> > crs_yield_curve_bootstrapping(Date evaluationDate,
+		Handle<YieldTermStructure> flatLegCurve,  //USD
+		Handle<YieldTermStructure> spreadLegCurve, //EUR
+		Real fxRate,
+		std::vector<std::pair<Period, Rate> > crsRate
+		);
+
+
 }
 
 #endif

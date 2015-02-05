@@ -340,9 +340,10 @@ boost::shared_ptr<CDSCurveData> LoadCDSCurve( const std::wstring& code )
 {
 	CQuery dbConnector;
 	Date rcvDate;
+	::QueryRecentCurveData( code, dbConnector, rcvDate );
+
 	try
-	{
-		::QueryRecentCurveData( code, dbConnector, rcvDate );
+	{		
 	}
 	catch( const std::exception& )
 	{
@@ -351,9 +352,10 @@ boost::shared_ptr<CDSCurveData> LoadCDSCurve( const std::wstring& code )
 
 
 	boost::shared_ptr<CDSCurveData> curveData = boost::shared_ptr<CDSCurveData>( new CDSCurveData() );
-
-	while( !dbConnector.Fetch() )
-	{
+	
+	int n = dbConnector.GetNumRow();
+	for (int i=0; i<n; ++i) {
+		dbConnector.Fetch();
 		curveData->tenors.push_back( ::ParsePeriod( dbConnector.GetStr( L"Tenor" ) ) );
 		curveData->quotedSpreads.push_back( boost::lexical_cast<Real>( dbConnector.GetStr( L"Value" ) ) );
 	}
@@ -425,30 +427,65 @@ std::pair<boost::shared_ptr<YieldCurveData>, std::vector<Real> > LoadCRSCurve( c
 {
 	std::vector<std::wstring> codeVec;
 	boost::split( codeVec, code, boost::is_any_of( L"_" ), boost::algorithm::token_compress_on );
-
+	
+	boost::shared_ptr<YieldCurveData> res( new YieldCurveData );	
 	boost::shared_ptr<FXCurveData> fxCurve( CurveTable::instance().GetFXCurve( codeVec[ 0 ] + L"_FX", fxShiftOption ) );
 	Real spot = fxCurve->fwdValue.front();
 
-	boost::shared_ptr<YieldCurveData> res( new YieldCurveData );
-	boost::shared_ptr<YieldTermStructure> foreignIRS( build_yield_curve( *boost::dynamic_pointer_cast<InterestRateCurveInfoWrapper>( CurveTable::instance().GetYieldCurve( codeVec[ 0 ], ShiftOption::ShiftNothing ) )->GetCurveData() ) );
+	if ( codeVec[ 0 ] == L"EURUSD") {	
+		boost::shared_ptr<YieldTermStructure> usdCurve( 
+			build_yield_curve( *boost::dynamic_pointer_cast<InterestRateCurveInfoWrapper>( CurveTable::instance().GetYieldCurve( L"USD", ShiftOption::ShiftNothing ) )->GetCurveData() ) );
+		boost::shared_ptr<YieldTermStructure> eurCurve( 
+			build_yield_curve( *boost::dynamic_pointer_cast<InterestRateCurveInfoWrapper>( CurveTable::instance().GetYieldCurve( L"EUR", ShiftOption::ShiftNothing ) )->GetCurveData() ) );
+		boost::shared_ptr<CDSCurveData> crsData( CurveTable::instance().GetCDSCurve( codeVec[ 0 ] + L"CRS") );
+		std::vector<std::pair<Period, Rate> > crsRate;
+		for (Size i=0; i<crsData->tenors.size(); ++i)
+			crsRate.push_back(std::pair<Period, Rate>(crsData->tenors[i], crsData->quotedSpreads[i] / 10000.0 ));
 
-	res->dates.resize( fxCurve->fwdValue.size() );
-	res->yields.resize( fxCurve->fwdValue.size() );
-	res->dc = Actual365Fixed();
+		std::vector<std::pair<Integer, Rate> > temp = crs_yield_curve_bootstrapping(
+			PricingSetting::instance().GetDataDate(), Handle<YieldTermStructure>(usdCurve), Handle<YieldTermStructure>(eurCurve), spot, crsRate);
 
-	for( size_t i = 1; i < fxCurve->fwdValue.size() - 1; i++ )
-	{
-		Real t = Actual365Fixed().yearFraction( fxCurve->fwdDate[ 0 ], fxCurve->fwdDate[ i ] );
-		res->dates[ i ] = fxCurve->fwdDate[ i ];
-		res->yields[ i ] = std::log( fxCurve->fwdValue[ i ] / spot * std::exp( foreignIRS->zeroRate( t, Continuous ) * t ) ) / t + shiftOption.GetDelta( i, 0 );
+		res->dates.reserve( temp.size() );
+		res->yields.reserve( temp.size() );
+
+		for each( std::pair<Integer, Rate> v in temp )
+		{
+			res->dates.push_back( Date( PricingSetting::instance().GetEvaluationDate() + v.first ) );
+			res->yields.push_back( v.second );
+		}
+
+		Date minDate = PricingSetting::instance().GetEvaluationDate();
+		// 가장 최근 이자율을 이자율받은날의 이자율로 박아준다!
+		if( res->dates.front().serialNumber() >= minDate.serialNumber() )
+		{
+			res->dates.insert( res->dates.begin(), Date( minDate.serialNumber(), 0 ) );
+			volatile Real firstSpot = res->yields.front();
+			res->yields.insert( res->yields.begin(), firstSpot );
+			res->chunkIndex.insert( res->chunkIndex.begin(), 0 );
+		}
 	}
 
-	res->dates.back() = fxCurve->fwdDate.back();
-	res->yields.back() = *( res->yields.rbegin() + 1 );
+	else {		
+		boost::shared_ptr<YieldTermStructure> foreignIRS( build_yield_curve( *boost::dynamic_pointer_cast<InterestRateCurveInfoWrapper>( CurveTable::instance().GetYieldCurve( codeVec[ 0 ], ShiftOption::ShiftNothing ) )->GetCurveData() ) );
 
-	res->dates[ 0 ] = Date( fxCurve->fwdDate.front().serialNumber(), 0 );
-	res->yields[ 0 ] = res->yields[ 1 ];
-	res->chunkIndex = fxCurve->chunkIndex;
+		res->dates.resize( fxCurve->fwdValue.size() );
+		res->yields.resize( fxCurve->fwdValue.size() );
+		res->dc = Actual365Fixed();
+
+		for( size_t i = 1; i < fxCurve->fwdValue.size() - 1; i++ )
+		{
+			Real t = Actual365Fixed().yearFraction( fxCurve->fwdDate[ 0 ], fxCurve->fwdDate[ i ] );
+			res->dates[ i ] = fxCurve->fwdDate[ i ];
+			res->yields[ i ] = std::log( fxCurve->fwdValue[ i ] / spot * std::exp( foreignIRS->zeroRate( t, Continuous ) * t ) ) / t + shiftOption.GetDelta( i, 0 );
+		}
+
+		res->dates.back() = fxCurve->fwdDate.back();
+		res->yields.back() = *( res->yields.rbegin() + 1 );
+
+		res->dates[ 0 ] = Date( fxCurve->fwdDate.front().serialNumber(), 0 );
+		res->yields[ 0 ] = res->yields[ 1 ];
+		res->chunkIndex = fxCurve->chunkIndex;
+	}
 
 	return std::make_pair( res, res->yields );
 }

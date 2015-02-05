@@ -7,6 +7,7 @@
 #include "RegisterSwaptionFunctor.h"
 #include "RegisterCapVolFunctor.h"
 #include "RemoveCurveFunctor.h"
+#include "RegisterCurveFunctor.h"
 
 boost::shared_ptr<IFunctor> FunctorFactory::GetFunctor( const std::string& name )
 {
@@ -31,6 +32,8 @@ void FunctorFactory::BuildFunctor()
 	RegisterFunctor( "RegisterSwaption", boost::shared_ptr<IFunctor>( new RegisterSwaptionFunctor() ) );
 	RegisterFunctor( "RegisterCapVol", boost::shared_ptr<IFunctor>( new RegisterCapVolFunctor() ) );
 	RegisterFunctor( "RemoveCurve", boost::shared_ptr<IFunctor>( new RemoveCurveFunctor() ) );
+	RegisterFunctor( "RegisterCurve" , boost::shared_ptr<IFunctor>( new RegisterCurveFunctor() ) );
+	RegisterFunctor( "BuildCurve" , boost::shared_ptr<IFunctor>( new BuildCurveFunctor() ) );
 }
 
 FunctorFactory::FunctorFactory()

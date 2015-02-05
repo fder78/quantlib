@@ -1,4 +1,6 @@
 #include "StdAfx.h"
+#include <iostream>
+#include <boost/timer.hpp>
 
 #include "RunPricingFunctor.h"
 
@@ -48,17 +50,20 @@ void RunPricingFunctor::Run( const TiXmlElement* param_root ) const
 		PricingSetting::instance().SetUseProxy( true, address );
 	}
 
+	boost::timer timer;
 	while( record )
-	{
+	{		
+		timer.restart();
 		boost::shared_ptr<IProductParam> param = IProductParam::Create( record );
 		params.push_back( param );
 
 		param->Calculate();
-		resRoot->InsertEndChild( *param->GetFinalResult() );
-		doc.SaveFile( outFileName );
 
-		record = record->NextSiblingElement();
-		idx++;
+		resRoot->InsertEndChild( *param->GetFinalResult() );
+		record = record->NextSiblingElement();		
+
+		std::cout<<++idx<<"\t"<<param->GetProductName()<<"\t"<<timer.elapsed()<<std::endl;
+		timer.restart();
 	}
 
 	if( PricingSetting::instance().UseProxy() )
