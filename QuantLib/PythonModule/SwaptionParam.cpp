@@ -183,22 +183,22 @@ ResultInfo SwaptionParam::DoCalculation()
 	}
 
 	
-	res.npv = swaption( m_evalDate
-										, m_side
-										, m_settlementType
-										, m_strike
-										, m_notional
-										, m_exerciseDate
-										, *m_scheduleFixed
-										, m_fixedDayCounter
-										, *m_scheduleFloating
-										, m_floatingDayCounter
-										, m_fixingDays
-										, m_BDCpayment
-										, floatingIdx
-										, dc
-										, vol
-										);
+	res.npv = swaption( PricingSetting::instance().GetEvaluationDate()
+		, m_side
+		, m_settlementType
+		, m_strike
+		, m_notional
+		, m_exerciseDate
+		, *m_scheduleFixed
+		, m_fixedDayCounter
+		, *m_scheduleFloating
+		, m_floatingDayCounter
+		, m_fixingDays
+		, m_BDCpayment
+		, floatingIdx
+		, dc
+		, vol
+		);
 	return res;
 }
 
@@ -232,7 +232,7 @@ private:
 QuantLib::Real SwaptionParam::GetVolatility() const
 {
 	boost::shared_ptr<SwaptionVolData> swtVolData = CurveTable::instance().GetSwaptionVolData( m_discountCurveProxy->GetCurveName(), m_discountCurveProxy->GetShiftOption() );
-	Date evalDate = m_evalDate;
+	Date evalDate ( PricingSetting::instance().GetEvaluationDate().serialNumber() );
 
 	typedef std::set<Period> PeriodSet;
 	typedef std::vector<Period> PeriodVec;
@@ -272,7 +272,7 @@ QuantLib::Real SwaptionParam::GetVolatility() const
 			Period nowLen = swtVolData->lengths[ dataIdx ];
 			Time matDiff = ( evalDate + nowMat ) - m_exerciseDate;
 			Time lenDiff = ( ( evalDate + nowLen + nowMat ) - ( evalDate + nowMat ) ) - ( m_terminationDate - m_exerciseDate );
-			Real dist = std::sqrt( matDiff * matDiff + lenDiff + lenDiff );
+			Real dist = std::sqrt( matDiff * matDiff + lenDiff * lenDiff );
 			if( dist == 0. )
 			{
 				return swtVolData->vols[ dataIdx ];

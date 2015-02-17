@@ -538,6 +538,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Gaussian1dModels.cpp" />
+    <ClCompile Include="MarkovFunctional.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />

@@ -17,6 +17,10 @@
  FOR A PARTICULAR PURPOSE.  See the license for more details.
 */
 
+//#define ORIGINAL_
+#ifdef ORIGINAL_
+
+
 #include <ql/quantlib.hpp>
 #include <boost/timer.hpp>
 #include <Windows.h>
@@ -701,3 +705,7 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 }
+
+
+
+#endif

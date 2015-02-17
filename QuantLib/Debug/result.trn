@@ -1,44 +1,75 @@
 <result_root>
-    <curve_data name="EURUSD_CRS" dc="temp">
-        <record>
-            <tenor type="string" value="2015-02-05" />
-            <days type="int" value="0" />
-            <yield type="double" value="0.00056704" />
-        </record>
-        <record>
-            <tenor type="string" value="2015-05-05" />
-            <days type="int" value="89" />
-            <yield type="double" value="0.00056704" />
-        </record>
-        <record>
-            <tenor type="string" value="2016-02-05" />
-            <days type="int" value="365" />
-            <yield type="double" value="0.00125262" />
-        </record>
-        <record>
-            <tenor type="string" value="2017-02-06" />
-            <days type="int" value="732" />
-            <yield type="double" value="0.00139887" />
-        </record>
-        <record>
-            <tenor type="string" value="2018-02-05" />
-            <days type="int" value="1096" />
-            <yield type="double" value="0.00181407" />
-        </record>
-        <record>
-            <tenor type="string" value="2020-02-05" />
-            <days type="int" value="1826" />
-            <yield type="double" value="0.00314558" />
-        </record>
-        <record>
-            <tenor type="string" value="2022-02-07" />
-            <days type="int" value="2559" />
-            <yield type="double" value="0.00470731" />
-        </record>
-        <record>
-            <tenor type="string" value="2025-02-05" />
-            <days type="int" value="3653" />
-            <yield type="double" value="0.00707931" />
-        </record>
-    </curve_data>
+    <IRSFICC445>
+        <type type="string" value="Swaption" />
+        <book type="string" value="IRS_KRW" />
+        <npv type="double" value="413998768.66945565" />
+        <unitPrice type="double" value="275.99917911" />
+        <notional type="double" value="15000000000.00000000" />
+        <cashFlow />
+        <evalTime type="string" value="2015-02-10 53400" />
+        <KeyExposure>
+            <KRW>
+                <kexpShift type="double" value="4003397.04283392" />
+                <kexp0 type="double" value="30897.54298794" />
+                <kexp1 type="double" value="7693.82540995" />
+                <kexp2 type="double" value="-57.66984946" />
+                <kexp3 type="double" value="-244.06711054" />
+                <kexp4 type="double" value="-2754722.07463667" />
+                <kexp5 type="double" value="-61484.64294654" />
+                <kexp6 type="double" value="4368.78149536" />
+                <kexp7 type="double" value="6727331.66450855" />
+                <kexp8 type="double" value="65024.78521964" />
+                <kexp9 type="double" value="0.00000000" />
+                <kexp10 type="double" value="0.00000000" />
+            </KRW>
+        </KeyExposure>
+        <GammaExposure>
+            <KRW>
+                <kexpShift type="double" value="16916.24459684" />
+                <kexp0 type="double" value="1874.14571548" />
+                <kexp1 type="double" value="-13590.20516515" />
+                <kexp2 type="double" value="1874.14449644" />
+                <kexp3 type="double" value="1874.14120412" />
+                <kexp4 type="double" value="1813.47560596" />
+                <kexp5 type="double" value="1856.95071733" />
+                <kexp6 type="double" value="1893.70444560" />
+                <kexp7 type="double" value="1260.56915283" />
+                <kexp8 type="double" value="1908.02259874" />
+                <kexp9 type="double" value="1874.13779163" />
+                <kexp10 type="double" value="1874.13779163" />
+            </KRW>
+        </GammaExposure>
+        <XGammaExposure />
+        <ChunkDeltaExposure>
+            <KRW>
+                <kexp0 type="double" value="-2731889.12923950" />
+                <kexp1 type="double" value="6677955.35161248" />
+                <kexp2 type="double" value="65024.78521964" />
+            </KRW>
+        </ChunkDeltaExposure>
+        <ChunkGammaExposure>
+            <KRW>
+                <kexp0 type="double" value="17650.83658361" />
+                <kexp1 type="double" value="-12961.53999591" />
+                <kexp2 type="double" value="1908.02259874" />
+            </KRW>
+        </ChunkGammaExposure>
+        <ChunkXGammaExposure>
+            <KRW>
+                <kexp0 type="double" value="8028.67605275" />
+                <kexp1 type="double" value="3189.17589268" />
+                <kexp2 type="double" value="4505.89373279" />
+                <kexp3 type="double" value="-3867.65341583" />
+                <kexp4 type="double" value="3827.98419546" />
+                <kexp5 type="double" value="33.86800170" />
+            </KRW>
+        </ChunkXGammaExposure>
+        <ChunkXCurveGammaExposure />
+        <VegaExposure />
+        <curves>
+            <curve>
+                <name type="string" value="KRW" />
+            </curve>
+        </curves>
+    </IRSFICC445>
 </result_root>
